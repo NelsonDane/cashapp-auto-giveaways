@@ -79,7 +79,10 @@ def main_program():
                 client.create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=current_replies[CASHTAGS.index(cashtag)], user_auth=True)
                 print(f'Replied using cashtag: {cashtag}')
                 print(f'Reply: {current_replies[CASHTAGS.index(cashtag)]}')
+                # Sleep for a bit
+                sleep(5)
         # Sleep for a bit
+        print('Sleeping for a bit...')
         sleep(60)
 
 # Run the main program
