@@ -14,5 +14,5 @@ COPY ./cashapp.py .
 # Install dependencies
 RUN pip install -r requirements.txt
 
-CMD ["python3","musecord.py"]
+CMD ["python3","cashapp.py"]
 

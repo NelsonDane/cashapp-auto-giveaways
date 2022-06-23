@@ -11,6 +11,9 @@ import random
 from time import sleep
 from dotenv import load_dotenv
 
+# CashApp ID Global Variable
+CASHAPPID = '1445650784'
+
 # Load the .env file
 load_dotenv()
 
@@ -42,41 +45,82 @@ replies = [
     "Would really help out!"
 ]
 
+# Function to follow Twitter accounts
+def followAccount(client, accountID):
+    try:
+        client.follow_user(target_user_id=accountID,user_auth=True)
+        #print(f'Followed account ID: {accountID}')
+    except Exception as e:
+        print(f'Error following {accountID}: {e}')
+    
 # Main program
 def main_program():
     # Run forever
     while True:
-        # Setup the Twitter API with bearer token of random account
-        api = random.randint(0, len(BEARER_TOKENS)-1)
-        client = tweepy.Client(bearer_token=BEARER_TOKENS[api],consumer_key=CONSUMER_KEYS[api], consumer_secret=CONSUMER_SECRETS[api], access_token=ACCESS_TOKENS[api], access_token_secret=ACCESS_TOKEN_SECRETS[api])
+        # Create client for each Twitter account and make sure they follow @CashApp
+        Clients = []
+        # Loop through each Twitter account
+        for CASHTAG in CASHTAGS:
+            # Set index for easy use
+            i = CASHTAGS.index(CASHTAG)
+            # Create client list
+            Clients.append(tweepy.Client(bearer_token=BEARER_TOKENS[i],consumer_key=CONSUMER_KEYS[i], consumer_secret=CONSUMER_SECRETS[i], access_token=ACCESS_TOKENS[i], access_token_secret=ACCESS_TOKEN_SECRETS[i]))
+   
+            # Figure out how to get user ID later
+            id2 = Clients[i].get_user(username='GamerSnail_')
+            id = id2.data.id
+            # Check to see if account is following @cashapp
+            # Get following list
+            following = Clients[i].get_users_following(id=id)
+            # Check to see if @cashapp is in the following list
+            for follow in following.data:
+                if follow.username == "CashApp":
+                    print(f'{CASHTAG} is already following @cashapp')
+                    break
+                else:
+                    followAccount(Clients[i], CASHAPPID)
+                    print(f'{CASHTAG} just followed @CashApp')         
 
         # Search for cashapp giveaways. We only cover the ones directly from cashapp
         # and they almost always use the term 'drop' when referring to cashtags and giveaways
         query = 'from:GamerSnail_ drop'
 
-        # Search for tweets
-        try:
-            tweets = client.search_recent_tweets(query=query, tweet_fields=['context_annotations', 'created_at'], max_results=10)
-        except Exception as e:
-            print(f'{datetime.datetime.now()} Failed to search for tweets using account {api}: {e}')
-            print('Trying with another account...')
+        # Search for tweets, using each account's client incase one hits the requests limit
+        for CASHTAG in CASHTAGS:
+            try:
+                # Set index for easy use
+                i = CASHTAGS.index(CASHTAG)
+                # Search for tweets that match the query
+                tweets = Clients[i].search_recent_tweets(query=query, tweet_fields=['context_annotations', 'created_at'], max_results=10)
+                # Print total found giveaway tweets
+                print(f'Found {len(tweets.data)} giveaway tweets!')
+                # If the search was successful, then break out of loop
+                break
+            except Exception as e:
+                print(f'{datetime.datetime.now()} Failed to search for tweets using account {CASHTAGS[i]}: {e}')
+                if i==len(CASHTAGS)-1:
+                    print(f'{datetime.datetime.now()} Failed to search for tweets using any account, exiting')
+                    sys.exit(1)
+                else:
+                    print('Trying with another account...')
 
         # Loop through the tweets and process them. Add try-excepts later
         for giveaway_tweet in tweets.data:
-            print('Giveaway tweet found!')
+            #print('Giveaway tweet found!')
             print(giveaway_tweet.text)
             # Choose replies for each cashtag so that none of them use the same reply
             current_replies = random.sample(replies, len(CASHTAGS))
             # Loop through each cashtag
             for cashtag in CASHTAGS:
+                i = CASHTAGS.index(cashtag)
                 # Retweet the giveaway tweet
-                client.retweet(giveaway_tweet.id,user_auth=True)
+                Clients[i].retweet(giveaway_tweet.id,user_auth=True)
                 print(f'Retweeted using cashtag: {cashtag}')
                 # Like the giveaway tweet
-                client.like(giveaway_tweet.id,user_auth=True)
+                Clients[i].like(giveaway_tweet.id,user_auth=True)
                 print(f'Liked using cashtag: {cashtag}')
                 # Reply to the giveaway tweet
-                client.create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=current_replies[CASHTAGS.index(cashtag)], user_auth=True)
+                Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=current_replies[CASHTAGS.index(cashtag)], user_auth=True)
                 print(f'Replied using cashtag: {cashtag}')
                 print(f'Reply: {current_replies[CASHTAGS.index(cashtag)]}')
                 # Sleep for a bit
