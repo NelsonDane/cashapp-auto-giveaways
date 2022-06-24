@@ -1,10 +1,3 @@
-# Nelson Dane
-# Python bot to like, retweet, and reply to cashapp giveaways with a user's cashtag
-
-# To Do:
-# Allow custom searches
-
-# Importing the necessary modules
 import os
 import sys
 import traceback
@@ -15,6 +8,15 @@ import datetime
 from replies import replies
 from time import sleep
 from dotenv import load_dotenv
+import pytextnow as pytn
+
+# Obtain username from https://www.textnow.com/messaging -> settings
+USERNAME = os.environ['username']
+PHONE = os.environ['number']
+SID = os.environ['SID']
+CSRF = os.environ['csrf']
+
+client = pytn.Client(USERNAME, sid_cookie = SID, csrf_cookie = CSRF)
 
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
@@ -151,7 +153,7 @@ def main_program():
         # Search for cashapp giveaways.
         # Need to add ability to set custom search terms
         query = 'from:GamerSnail_ -is:retweet drop'
-
+  
         # Search for tweets, using each account's client incase one hits the requests limit
         # I know I could set wait_on_rate, but since there's multiple accounts I'll just try them all
         for username in USERNAMES:
@@ -162,6 +164,8 @@ def main_program():
                 tweets = Clients[i].search_recent_tweets(query=query, max_results=10)
                 # Print total found giveaway tweets
                 print(f'Found {len(tweets.data)} giveaway tweets!')
+
+                client.send_sms(PHONE, f'{len(tweets.data)} giveaway tweets were found. PLease verify auto replies were sucessful!')
                 # If the search was successful, then break out of loop
                 break
             except Exception as e:
