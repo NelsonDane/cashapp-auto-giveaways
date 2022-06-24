@@ -52,24 +52,15 @@ else:
 if len(BEARER_TOKENS) != len(CASHTAGS) != len(CONSUMER_KEYS) != len(CONSUMER_SECRETS) != len(ACCESS_TOKENS) != len(ACCESS_TOKEN_SECRETS) != len(USERNAMES):
     raise Exception("The number of usernames and cashtags must match the number of Twitter accounts")
 
-# Get start and end time
-if not os.environ["START_TIME"] or not os.environ["END_TIME"]:
-    raise Exception("Please specify the start and end time in the .env file")
-else:
-    # Set the start and end time
-    START_TIME = os.environ["START_TIME"]
-    END_TIME = os.environ["END_TIME"]
-    # Convert to float
-    START_TIME = float(START_TIME)
-    END_TIME = float(END_TIME)
+# Get start and end time, defaulting to 9:00am and 9:00pm
+START_TIME = float(os.environ.get("START_TIME","9"))
+END_TIME = float(os.environ.get("END_TIME","21"))
 
 # Get worded replies boolean, defaulting to False
 WORDED_REPLIES = os.environ.get("WORDED_REPLIES", False)
 
 # Get check interval, defaulting to 60 seconds
-CHECK_INTERVAL_SECONDS = os.environ.get("CHECK_INTERVAL_SECONDS", 60)
-# Convert to float
-CHECK_INTERVAL_SECONDS = float(CHECK_INTERVAL_SECONDS)
+CHECK_INTERVAL_SECONDS = float(os.environ.get("CHECK_INTERVAL_SECONDS", "60"))
 
 # Replies to use (add more in future)
 replies = [
