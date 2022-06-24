@@ -15,6 +15,7 @@ import datetime
 import tweepy
 import random
 import datetime
+from replies import replies
 from time import sleep
 from dotenv import load_dotenv
 
@@ -61,13 +62,6 @@ WORDED_REPLIES = os.environ.get("WORDED_REPLIES", False)
 
 # Get check interval, defaulting to 60 seconds
 CHECK_INTERVAL_SECONDS = float(os.environ.get("CHECK_INTERVAL_SECONDS", "60"))
-
-# Replies to use (add more in future)
-replies = [
-    "I'd love some!",
-    "This sounds awesome!",
-    "Would really help out!"
-]
 
 # Function to follow Twitter accounts
 def followAccount(client, accountID):
@@ -173,12 +167,12 @@ def main_program():
                 if not giveaway_tweet.id in recent_tweet_ids[i]:
                     if WORDED_REPLIES:
                         # Reply to the giveaway tweet with a worded reply
-                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"current_replies[i] {CASHTAGS[i]}", user_auth=True)
-                        print(f'{USERNAMES[i]} reply: {current_replies[i]}')
+                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"{current_replies[i]} ${CASHTAGS[i]}", user_auth=True)
+                        print(f'{USERNAMES[i]} reply: ${current_replies[i]}')
                     else:
                         # Reply to the giveaway tweet without a worded reply
-                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=CASHTAGS[i], user_auth=True)
-                        print(f'{USERNAMES[i]} reply: {CASHTAGS[i]}')
+                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"${CASHTAGS[i]}", user_auth=True)
+                        print(f'{USERNAMES[i]} reply: ${CASHTAGS[i]}')
                 else:
                     print(f'{USERNAMES[i]} already replied to this tweet, moving on...')
                 # Sleep for a bit before next tweet
