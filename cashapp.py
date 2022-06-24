@@ -22,7 +22,7 @@ import pytextnow as pytn
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
 
-USERNAME = os.environ['username']
+USERNAME = os.environ['PY_USERNAME']
 PHONE = os.environ['number']
 
 client = pytn.Client(USERNAME) 
