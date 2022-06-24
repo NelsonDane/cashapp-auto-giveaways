@@ -17,9 +17,15 @@ import random
 import datetime
 from time import sleep
 from dotenv import load_dotenv
+import pytextnow as pytn
 
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
+
+USERNAME = os.environ['PY_USERNAME']
+PHONE = os.environ['number']
+
+client = pytn.Client(USERNAME) 
 
 # Load the .env file
 load_dotenv()
@@ -154,6 +160,8 @@ def main_program():
                 tweets = Clients[i].search_recent_tweets(query=query, max_results=10)
                 # Print total found giveaway tweets
                 print(f'Found {len(tweets.data)} giveaway tweets!')
+
+                client.send_sms(PHONE , "Giveaway found!")
                 # If the search was successful, then break out of loop
                 break
             except Exception as e:
