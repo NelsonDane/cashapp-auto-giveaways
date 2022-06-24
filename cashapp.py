@@ -24,8 +24,9 @@ CASHAPPID = '1445650784'
 
 USERNAME = os.environ['PY_USERNAME']
 PHONE = os.environ['number']
-
-client = pytn.Client(USERNAME) 
+SID = os.environ['CONNECT_SID']
+CSRF = os.environ['CSRF']
+client = pytn.Client(USERNAME, sid_cookie=SID, crsf_cookie = CSRF) 
 
 # Load the .env file
 load_dotenv()
