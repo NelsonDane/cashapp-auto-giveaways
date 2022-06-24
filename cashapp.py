@@ -3,9 +3,6 @@
 
 # To Do:
 # Allow custom searches
-# Better logs
-# Add a README
-# Better date checker
 
 # Importing the necessary modules
 import os
@@ -55,6 +52,11 @@ END_TIME = float(os.environ.get("END_TIME","21"))
 
 # Get worded replies boolean, defaulting to False
 WORDED_REPLIES = os.environ.get("WORDED_REPLIES", False)
+# Because it imports as string, convert to bool
+if type(WORDED_REPLIES) == str and (WORDED_REPLIES.lower()).replace(" ","") == 'true':
+    WORDED_REPLIES = True
+else:
+    WORDED_REPLIES = False
 
 # Get check interval, defaulting to 60 seconds
 CHECK_INTERVAL_SECONDS = float(os.environ.get("CHECK_INTERVAL_SECONDS", "60"))
@@ -95,6 +97,12 @@ def idFromUsername(client, username):
 
 # Main program
 def main_program():
+    # Kill the program if the time is outside of the start and end times
+    if not (datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME):
+        print(f'{datetime.datetime.now()} Not running because it is not between {START_TIME} and {END_TIME}')
+        sleep(CHECK_INTERVAL_SECONDS)    
+        raise Exception(f"Not running because it is not between {START_TIME} and {END_TIME}")
+
     # Create client for each Twitter account and make sure they follow @CashApp
     Clients = []
     # Loop through each Twitter account
@@ -198,13 +206,7 @@ def main_program():
 
 # Run the main program if it's the correct time
 try:
-    # Only run if time is between wanted times
-    if datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME:
-        # Run the main program
-        main_program()
-    else:
-        print(f'{datetime.datetime.now()} Not running because it is not between {START_TIME} and {END_TIME}')
-        sleep(CHECK_INTERVAL_SECONDS)
+    main_program()
 
 # Get all exceptions
 except Exception:
