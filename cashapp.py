@@ -49,10 +49,6 @@ else:
     # Set the hashtags
     USERNAMES = os.environ["USERNAMES"].split(",")
 
-# Make sure the number of bearer/consumer/acess tokens (twitter accounts) and cashtags match
-if len(BEARER_TOKENS) != len(CASHTAGS) != len(CONSUMER_KEYS) != len(CONSUMER_SECRETS) != len(ACCESS_TOKENS) != len(ACCESS_TOKEN_SECRETS) != len(USERNAMES):
-    raise Exception("The number of usernames and cashtags must match the number of Twitter accounts")
-
 # Get start and end time, defaulting to 9:00am and 9:00pm
 START_TIME = float(os.environ.get("START_TIME","9"))
 END_TIME = float(os.environ.get("END_TIME","21"))
@@ -62,6 +58,25 @@ WORDED_REPLIES = os.environ.get("WORDED_REPLIES", False)
 
 # Get check interval, defaulting to 60 seconds
 CHECK_INTERVAL_SECONDS = float(os.environ.get("CHECK_INTERVAL_SECONDS", "60"))
+
+# Validation
+# Make sure the number of bearer/consumer/acess tokens (twitter accounts) and cashtags match
+if len(BEARER_TOKENS) != len(CASHTAGS) != len(CONSUMER_KEYS) != len(CONSUMER_SECRETS) != len(ACCESS_TOKENS) != len(ACCESS_TOKEN_SECRETS) != len(USERNAMES):
+    raise Exception("The number of usernames and cashtags must match the number of Twitter accounts")
+
+# Remove whitespaces from API tokens and keys, and $/@ from cashtags and usernames
+for i in range(len(USERNAMES)):
+    BEARER_TOKENS[i] = BEARER_TOKENS[i].replace(" ","")
+    CONSUMER_KEYS[i] = CONSUMER_KEYS[i].replace(" ","")
+    CONSUMER_SECRETS[i] = CONSUMER_SECRETS[i].replace(" ","")
+    ACCESS_TOKENS[i] = ACCESS_TOKENS[i].replace(" ","")
+    ACCESS_TOKEN_SECRETS[i] = ACCESS_TOKEN_SECRETS[i].replace(" ","")
+    CASHTAGS[i] = (CASHTAGS[i].replace(" ","")).replace("$","")
+    USERNAMES[i] = (USERNAMES[i].replace(" ","")).replace("@","")
+
+# Make sure start and end times are valid
+if START_TIME > END_TIME:
+    raise Exception("Start time must be before end time")
 
 # Function to follow Twitter accounts
 def followAccount(client, accountID):
@@ -168,7 +183,7 @@ def main_program():
                     if WORDED_REPLIES:
                         # Reply to the giveaway tweet with a worded reply
                         Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"{current_replies[i]} ${CASHTAGS[i]}", user_auth=True)
-                        print(f'{USERNAMES[i]} reply: ${current_replies[i]}')
+                        print(f'{USERNAMES[i]} reply: {current_replies[i]} ${CASHTAGS[i]}')
                     else:
                         # Reply to the giveaway tweet without a worded reply
                         Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"${CASHTAGS[i]}", user_auth=True)
