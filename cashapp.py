@@ -59,6 +59,11 @@ if type(WORDED_REPLIES) == str and (WORDED_REPLIES.lower()).replace(" ","") == '
 else:
     WORDED_REPLIES = False
 
+# Make sure there's enough replies for each account
+if len(USERNAMES) > len(replies):
+    print("Not enough replies for all Twitter accounts, disabling replies")
+    WORDED_REPLIES = False
+
 # Get check interval, defaulting to 60 seconds
 CHECK_INTERVAL_SECONDS = float(os.environ.get("CHECK_INTERVAL_SECONDS", "60"))
 
