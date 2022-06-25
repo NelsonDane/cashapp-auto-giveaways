@@ -81,11 +81,26 @@ if START_TIME > END_TIME:
     raise Exception("Start time must be before end time")
 
 # Function to follow Twitter accounts
-def followAccount(client, accountID):
-    try:
-        client.follow_user(target_user_id=accountID,user_auth=True)
-    except Exception as e:
-        print(f'Error following {accountID}: {e}')
+def followAccount(client, currentUsername, usernameToFollow):
+    # Get the user ID from the username
+    userID = idFromUsername(client, currentUsername)
+    followID = idFromUsername(client, usernameToFollow)
+    # Check to see if account is following already
+    # Get following list
+    following = client.get_users_following(id=userID)
+    # Check to see if it is in the following list, following if it isn't
+    found = False
+    for follow in following.data:
+        if follow.username == usernameToFollow:
+            print(f'{currentUsername} is already following {usernameToFollow}')
+            found = True
+            break
+    if not found:
+        try:
+            client.follow_user(target_user_id=followID, user_auth=True)
+            print(f'{currentUsername} just followed {usernameToFollow}')  
+        except Exception as e:
+            print(f'Error following {usernameToFollow} with {currentUsername}: {e}')
 
 # Function to convert handle into ID
 def idFromUsername(client, username):
@@ -94,6 +109,52 @@ def idFromUsername(client, username):
         return id.data.id
     except Exception as e:
         print(f'Error getting ID from {username}: {e}')
+
+def usernameFromID(client, id):
+    try:
+        username = client.get_user(id=id,user_fields=['username'])
+        return username.data.username
+    except Exception as e:
+        print(f'Error getting username from {id}: {e}')
+
+# Function to find mentions and hastags
+def findHashtags(tweet):
+    # Start found at false
+    hashFound = False
+    # Create hashtags string
+    hashtags = ""
+    # Iterate through each character
+    for letter in tweet:
+        # If hashtag found, then it's a hashtag
+        if letter == "#":
+            hashFound = True
+        # If a space if found, then it's the end of the hashtag
+        if letter == " ":
+            hashFound = False
+        # If none above is true, then add the letter to the hashtag
+        elif hashFound:
+            hashtags += letter
+    # Hacky, but add space in front of #, then remove trailing whitespace and return
+    return (hashtags.replace("#"," #")).strip()
+
+def findMentions(tweet):
+    # Start found at false
+    atFound = False
+    # Create mentions string
+    usernames = ""
+    # Iterate through each character
+    for letter in tweet:
+        # If at sign found, then it's a user mention
+        if letter == "@":
+            atFound = True
+        # If a space if found, then it's the end of the mention
+        if letter == " ":
+            atFound = False
+        # If none above is true, then add the letter to the username
+        elif atFound:
+            usernames += letter
+    # Hacky, but add space in front of #, then remove trailing whitespace and return
+    return (usernames.replace("@"," @")).strip()
 
 # Main program
 def main_program():
@@ -113,25 +174,11 @@ def main_program():
         Clients.append(tweepy.Client(bearer_token=BEARER_TOKENS[i],consumer_key=CONSUMER_KEYS[i], consumer_secret=CONSUMER_SECRETS[i], access_token=ACCESS_TOKENS[i], access_token_secret=ACCESS_TOKEN_SECRETS[i]))
 
     # Generate userID's and check if they follow @CashApp
-    for username in USERNAMES:
+    for client in Clients:
         # Set index for easy use
-        i = USERNAMES.index(username)
-        # Get the user ID from the username
-        userID = idFromUsername(Clients[i], username)
-        # Check to see if account is following @cashapp
-        # Get following list
-        following = Clients[i].get_users_following(id=userID)
-        # Check to see if @cashapp is in the following list, following if it isn't
-        found = False
-        for follow in following.data:
-            if follow.username == "CashApp":
-                print(f'{username} is already following @cashapp')
-                found = True
-                break
-        if not found:
-            followAccount(Clients[i], CASHAPPID)
-            print(f'{username} just followed @CashApp')  
-  
+        i = Clients.index(client)
+        followAccount(client, USERNAMES[i], "CashApp")
+
     # Run search forever
     while True:
         # Update recent tweets from each user
@@ -159,7 +206,7 @@ def main_program():
                 # Set index for easy use
                 i = USERNAMES.index(username)
                 # Search for tweets that match the query
-                tweets = Clients[i].search_recent_tweets(query=query, max_results=10)
+                tweets = Clients[i].search_recent_tweets(query=query, max_results=10, tweet_fields=['author_id'])
                 # Print total found giveaway tweets
                 print(f'Found {len(tweets.data)} giveaway tweets!')
                 # If the search was successful, then break out of loop
@@ -175,31 +222,45 @@ def main_program():
         # Loop through the tweets and process them
         for giveaway_tweet in tweets.data:
             print(giveaway_tweet.text)
+            # Get user mentions
+            mentions = findMentions(giveaway_tweet.text)
+            mentionsList = mentions.replace("@","").split(" ")
+            # Get hashtags
+            hashtags = findHashtags(giveaway_tweet.text)
             # Choose replies for each cashtag so that none of them use the same reply
             current_replies = random.sample(replies, len(CASHTAGS))
             # Loop through each cashtag
-            for cashtag in CASHTAGS:
-                i = CASHTAGS.index(cashtag)
-                # Retweet the giveaway tweet
-                Clients[i].retweet(giveaway_tweet.id,user_auth=True)
-                print(f'Retweeted using: {USERNAMES[i]}')
-                # Like the giveaway tweet
-                Clients[i].like(giveaway_tweet.id,user_auth=True)
-                print(f'Liked using: {USERNAMES[i]}')
-                # Check if tweet is already replied to, and if not then reply to the giveaway tweet
+            for username in USERNAMES:
+                i = USERNAMES.index(username)
+                # Check if tweet is already replied to, and if not then continue to the giveaway tweet
                 if not giveaway_tweet.id in recent_tweet_ids[i]:
+                    # Follow all mentioned users in giveaway tweet
+                    if mentions:
+                        for mention in mentionsList:
+                            # Set index for easy use
+                            i = mentionsList.index(mention)
+                            # Follow mentioned user
+                            followAccount(Clients[i], username, mention)
+                    # Follow author of giveaway tweet
+                    followAccount(Clients[i], username, usernameFromID(Clients[i], giveaway_tweet.author_id))
+                    # Retweet the giveaway tweet
+                    Clients[i].retweet(giveaway_tweet.id,user_auth=True)
+                    print(f'Retweeted using: {USERNAMES[i]}')
+                    # Like the giveaway tweet
+                    Clients[i].like(giveaway_tweet.id,user_auth=True)
+                    print(f'Liked using: {USERNAMES[i]}')
                     if WORDED_REPLIES:
                         # Reply to the giveaway tweet with a worded reply
-                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"{current_replies[i]} ${CASHTAGS[i]}", user_auth=True)
-                        print(f'{USERNAMES[i]} reply: {current_replies[i]} ${CASHTAGS[i]}')
+                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"{current_replies[i]} {mentions} {hashtags} ${CASHTAGS[i]}", user_auth=True)
+                        print(f'{USERNAMES[i]} reply: {current_replies[i]} {mentions} {hashtags} ${CASHTAGS[i]}')
                     else:
                         # Reply to the giveaway tweet without a worded reply
-                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"${CASHTAGS[i]}", user_auth=True)
-                        print(f'{USERNAMES[i]} reply: ${CASHTAGS[i]}')
+                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"{mentions} {hashtags} ${CASHTAGS[i]}", user_auth=True)
+                        print(f'{USERNAMES[i]} reply: {mentions} {hashtags} ${CASHTAGS[i]}')
                 else:
                     print(f'{USERNAMES[i]} already replied to this tweet, moving on...')
-                # Sleep for a bit before next tweet
-                sleep(random.uniform(1,5))
+            # Sleep for a bit before next tweet
+            sleep(random.uniform(1,5))
         # Sleep for a bit before rechecking for new giveaways
         print(f'All finished, sleeping for {CHECK_INTERVAL_SECONDS} seconds...')
         sleep(CHECK_INTERVAL_SECONDS)
