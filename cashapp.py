@@ -5,6 +5,7 @@ import datetime
 import tweepy
 import random
 import datetime
+import pytextnow as pytn
 from replies import replies
 from time import sleep
 from dotenv import load_dotenv
@@ -59,6 +60,21 @@ if len(USERNAMES) > len(replies):
 # Get check interval, defaulting to 60 seconds
 CHECK_INTERVAL_SECONDS = float(os.environ.get("CHECK_INTERVAL_SECONDS", "60"))
 
+# Get worded replies boolean, defaulting to False
+PYTEXTNOW = os.environ.get("PYTEXTNOW", False)
+# Because it imports as string, convert to bool
+if type(PYTEXTNOW) == str and (PYTEXTNOW.lower()).replace(" ","") == 'true':
+    PYTEXTNOW = True
+else:
+    PYTEXTNOW = False
+
+if PYTEXTNOW:
+    # Obtain username from https://www.textnow.com/messaging -> settings
+    USERNAME = os.environ['USERNAME']
+    PHONE = os.environ['NUMBER']
+    SID = os.environ['SID']
+    CSRF = os.environ['CSRF']
+    PYclient = pytn.Client(USERNAME, sid_cookie = SID, csrf_cookie = CSRF)
 # Validation
 # Make sure the number of bearer/consumer/acess tokens (twitter accounts) and cashtags match
 if len(BEARER_TOKENS) != len(CASHTAGS) != len(CONSUMER_KEYS) != len(CONSUMER_SECRETS) != len(ACCESS_TOKENS) != len(ACCESS_TOKEN_SECRETS) != len(USERNAMES):
@@ -244,6 +260,8 @@ def main_program():
             if "drop" in tweet.text.lower() or "must follow" in tweet.text.lower() or "partnered" in tweet.text.lower() or "your $Cashtag" in tweet.text.lower() or "below" in tweet.text.lower() or "partner" in tweet.text.lower() or "giveaway" in tweet.text.lower() or "give away" in tweet.text.lower() or "chance to win" in tweet.text.lower() :
               if(tweet.text not in store):
                 final_list.append(tweet)
+                if PYTEXTNOW:
+                    PYclient.send_sms(PHONE, "CashApp Giveaway Tweet Found!!")
         
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
