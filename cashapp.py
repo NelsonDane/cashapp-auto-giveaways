@@ -251,7 +251,7 @@ def main_program():
             # If the tweet contains "drop" or "must follow", then add to giveaway tweet list
             if "drop" in tweet.text.lower() or "must follow" in tweet.text.lower() or "partnered" in tweet.text.lower() or "your $Cashtag" in tweet.text.lower() or "below" in tweet.text.lower() or "partner" in tweet.text.lower() or "giveaway" in tweet.text.lower() or "give away" in tweet.text.lower() or "chance to win" in tweet.text.lower() :
                 final_list.append(tweet)
-                PYclient..send_sms(PHONE, "CashApp Giveaway Tweet Found!!")
+                PYclient.send_sms(PHONE, "CashApp Giveaway Tweet Found!!")
         
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
