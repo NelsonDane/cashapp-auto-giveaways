@@ -9,6 +9,8 @@ RUN apk add --no-cache py3-pip
 # Grab needed files
 WORKDIR /app
 COPY ./requirements.txt .
+COPY replies.py .
+COPY searches.py .
 COPY ./cashapp.py .
 
 # Install dependencies
