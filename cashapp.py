@@ -313,6 +313,7 @@ def main_program():
         # Sleep for a bit before rechecking for new giveaways
         print()
         print(f'All finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...')
+        sleep(CHECK_INTERVAL_SECONDS)
 
 # Run the main program if it's the correct time
 try:
