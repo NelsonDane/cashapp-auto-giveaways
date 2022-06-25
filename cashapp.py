@@ -1,3 +1,6 @@
+# Nelson Dane and Sazn
+# Python bot to like, retweet, and reply to cashapp giveaways with a user's cashtag
+
 import os
 import sys
 import traceback
@@ -5,10 +8,10 @@ import datetime
 import tweepy
 import random
 import datetime
+import pytextnow as pytn
 from replies import replies
 from time import sleep
 from dotenv import load_dotenv
-import pytextnow as pytn
 
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
