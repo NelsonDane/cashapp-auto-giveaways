@@ -158,11 +158,14 @@ def findMentions(tweet):
 
 # Main program
 def main_program():
-    # Kill the program if the time is outside of the start and end times
-    if not (datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME):
-        print(f'{datetime.datetime.now()} Not running because it is not between {START_TIME} and {END_TIME}')
-        sleep(CHECK_INTERVAL_SECONDS)    
-        raise Exception(f"Not running because it is not between {START_TIME} and {END_TIME}")
+    run_main = False
+    while not run_main:
+        # Kill the program if the time is outside of the start and end times
+        if (datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME):
+            run_main = True
+        else:
+            print(f'{datetime.datetime.now()} Not running because it is not between {START_TIME} and {END_TIME}')
+            sleep(CHECK_INTERVAL_SECONDS)
 
     # Create client for each Twitter account and make sure they follow @CashApp
     Clients = []
