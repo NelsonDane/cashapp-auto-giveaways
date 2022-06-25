@@ -1,7 +1,3 @@
-# Nelson Dane
-# Python bot to like, retweet, and reply to cashapp giveaways with a user's cashtag
-
-# Importing the necessary modules
 import os
 import sys
 import traceback
@@ -10,7 +6,7 @@ import tweepy
 import random
 import datetime
 from replies import replies
-#from searches import searches
+from searches import searches
 from time import sleep
 from dotenv import load_dotenv
 
@@ -94,12 +90,10 @@ def followAccount(client, currentUsername, usernameToFollow):
     # Check to see if it is in the following list, following if it isn't
     found = False
     for follow in following.data:
-        # If the user is already following, set found to true and break out of loop
         if follow.username == usernameToFollow:
             print(f'{currentUsername} is already following {usernameToFollow}')
             found = True
             break
-    # If not found in following list, follow the user
     if not found:
         try:
             client.follow_user(target_user_id=followID, user_auth=True)
@@ -109,16 +103,13 @@ def followAccount(client, currentUsername, usernameToFollow):
 
 # Function to convert handle into ID
 def idFromUsername(client, username):
-    # Get user ID and return it
     try:
         id = client.get_user(username=username,tweet_fields=['id'])
         return id.data.id
     except Exception as e:
         print(f'Error getting ID from {username}: {e}')
 
-# Function to get the username from the ID
 def usernameFromID(client, id):
-    # Get user username and return it
     try:
         username = client.get_user(id=id,user_fields=['username'])
         return username.data.username
@@ -233,7 +224,9 @@ def main_program():
                 i = USERNAMES.index(username)
                 # Get liked tweets by CashApp
                 cashapp_likes = Clients[i].get_liked_tweets(id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
+                print()
                 print("Searching for liked tweets by CashApp...")
+                print()
                 # If the search was successful, break out of the loop
                 break
             except Exception as e:
@@ -261,6 +254,7 @@ def main_program():
             hashtags = findHashtags(giveaway_tweet.text)
             # Choose replies for each cashtag so that none of them use the same reply
             current_replies = random.sample(replies, len(CASHTAGS))
+            print()
             # Loop through each cashtag
             for username in USERNAMES:
                 i = USERNAMES.index(username)
@@ -294,11 +288,14 @@ def main_program():
                     print(f'{username} already replied to this tweet, moving on...')
             # Sleep for a bit before next tweet
             sleep(random.uniform(1,5))
+        
         # Sleep for a bit before rechecking for new giveaways
+        print()
         print(f'All finished, sleeping for {CHECK_INTERVAL_SECONDS} seconds...')
+        print()
         sleep(CHECK_INTERVAL_SECONDS)
 
-# Run the main program
+# Run the main program if it's the correct time
 try:
     main_program()
 
