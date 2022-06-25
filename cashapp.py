@@ -258,14 +258,14 @@ def main_program():
         for tweet in cashapp_likes.data:
             # If the tweet contains "drop" or "must follow", then add to giveaway tweet list
             if "drop" in tweet.text.lower() or "must follow" in tweet.text.lower() or "partnered" in tweet.text.lower() or "your $cashtag" in tweet.text.lower() or "below" in tweet.text.lower() or "partner" in tweet.text.lower() or "giveaway" in tweet.text.lower() or "give away" in tweet.text.lower() or "chance to win" in tweet.text.lower() :
-              if(tweet.text not in store):
+              if(tweet.id not in store):
                 final_list.append(tweet)
                 if PYTEXTNOW:
                     PYclient.send_sms(PHONE, "CashApp Giveaway Tweet Found!!")
         
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
-            store.append(giveaway_tweet.text)
+            store.append(giveaway_tweet.id)
             print(giveaway_tweet.text)
             # Get user mentions
             mentions = findMentions(giveaway_tweet.text)
