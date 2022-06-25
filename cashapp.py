@@ -257,7 +257,7 @@ def main_program():
         final_list = []
         for tweet in cashapp_likes.data:
             # If the tweet contains "drop" or "must follow", then add to giveaway tweet list
-            if "drop" in tweet.text.lower() or "must follow" in tweet.text.lower() or "partnered" in tweet.text.lower() or "your $Cashtag" in tweet.text.lower() or "below" in tweet.text.lower() or "partner" in tweet.text.lower() or "giveaway" in tweet.text.lower() or "give away" in tweet.text.lower() or "chance to win" in tweet.text.lower() :
+            if "drop" in tweet.text.lower() or "must follow" in tweet.text.lower() or "partnered" in tweet.text.lower() or "your $cashtag" in tweet.text.lower() or "below" in tweet.text.lower() or "partner" in tweet.text.lower() or "giveaway" in tweet.text.lower() or "give away" in tweet.text.lower() or "chance to win" in tweet.text.lower() :
               if(tweet.text not in store):
                 final_list.append(tweet)
                 if PYTEXTNOW:
