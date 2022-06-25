@@ -13,6 +13,7 @@ import tweepy
 import random
 import datetime
 from replies import replies
+from searches import searches
 from time import sleep
 from dotenv import load_dotenv
 
@@ -198,10 +199,6 @@ def main_program():
                 sub_recent_tweets.append(tweet.conversation_id)
             recent_tweet_ids.append(sub_recent_tweets)
 
-        # Search for cashapp giveaways.
-        # Need to add ability to set custom search terms
-        query = 'from:GamerSnail_ -is:retweet drop'
-
         # Search for tweets, using each account's client incase one hits the requests limit
         # I know I could set wait_on_rate, but since there's multiple accounts I'll just try them all
         for username in USERNAMES:
@@ -209,7 +206,7 @@ def main_program():
                 # Set index for easy use
                 i = USERNAMES.index(username)
                 # Search for tweets that match the query
-                tweets = Clients[i].search_recent_tweets(query=query, max_results=10, tweet_fields=['author_id'])
+                tweets = Clients[i].search_recent_tweets(query=searches, max_results=10, tweet_fields=['author_id'])
                 # Print total found giveaway tweets
                 print(f'Found {len(tweets.data)} giveaway tweets!')
                 # If the search was successful, then break out of loop
