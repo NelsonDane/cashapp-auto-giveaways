@@ -9,6 +9,15 @@ from replies import replies
 from searches import searches
 from time import sleep
 from dotenv import load_dotenv
+import pytextnow as pytn
+
+# Obtain username from https://www.textnow.com/messaging -> settings
+USERNAME = os.environ['username']
+PHONE = os.environ['number']
+SID = os.environ['SID']
+CSRF = os.environ['csrf']
+
+PYclient = pytn.Client(USERNAME, sid_cookie = SID, csrf_cookie = CSRF)
 
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
@@ -241,9 +250,10 @@ def main_program():
         final_list = []
         for tweet in cashapp_likes.data:
             # If the tweet contains "drop" or "must follow", then add to giveaway tweet list
-            if "drop" in tweet.text.lower() or "must follow" in tweet.text.lower():
+            if "drop" in tweet.text.lower() or "must follow" in tweet.text.lower() or "partnered" in tweet.text.lower() or "your $Cashtag" in tweet.text.lower() or "below" in tweet.text.lower() or "partner" in tweet.text.lower() or "giveaway" in tweet.text.lower() or "give away" in tweet.text.lower() or "chance to win" in tweet.text.lower() :
                 final_list.append(tweet)
-        
+                PYclient.send_sms(PHONE, "CashApp Giveaway Tweet Found!!")
+
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
             print(giveaway_tweet.text)
@@ -291,9 +301,7 @@ def main_program():
         
         # Sleep for a bit before rechecking for new giveaways
         print()
-        print(f'All finished, sleeping for {CHECK_INTERVAL_SECONDS} seconds...')
-        print()
-        sleep(CHECK_INTERVAL_SECONDS)
+        print(f'All finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...')
 
 # Run the main program if it's the correct time
 try:
