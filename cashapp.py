@@ -203,26 +203,51 @@ def main_program():
 
         # Search for tweets, using each account's client incase one hits the requests limit
         # I know I could set wait_on_rate, but since there's multiple accounts I'll just try them all
+        # for username in USERNAMES:
+        #     try:
+        #         # Set index for easy use
+        #         i = USERNAMES.index(username)
+        #         # Search for tweets that match the query
+        #         #tweets = Clients[i].search_recent_tweets(query=searches, max_results=10, tweet_fields=['author_id'])
+        #         # Print total found giveaway tweets
+        #         print(f'Found {len(tweets.data)} giveaway tweets!')
+        #         # If the search was successful, then break out of loop
+        #         break
+        #     except Exception as e:
+        #         print(f'{datetime.datetime.now()} Failed to search for tweets using account {USERNAMES[i]}: {e}')
+        #         if i==len(USERNAMES)-1:
+        #             print(f'{datetime.datetime.now()} Failed to search for tweets using any account, exiting...')
+        #             sys.exit(1)
+        #         else:
+        #             print('Trying with another account...')
+
+        # Search for liked tweets by CashApp that contain "drop" or "must follow"
         for username in USERNAMES:
             try:
                 # Set index for easy use
                 i = USERNAMES.index(username)
-                # Search for tweets that match the query
-                tweets = Clients[i].search_recent_tweets(query=searches, max_results=10, tweet_fields=['author_id'])
-                # Print total found giveaway tweets
-                print(f'Found {len(tweets.data)} giveaway tweets!')
-                # If the search was successful, then break out of loop
+                # Get liked tweets by CashApp
+                cashapp_likes = Clients[i].get_liked_tweets(id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
+                print("Searching for liked tweets by CashApp...")
+                # If the search was successful, break out of the loop
                 break
             except Exception as e:
-                print(f'{datetime.datetime.now()} Failed to search for tweets using account {USERNAMES[i]}: {e}')
+                print(f'{datetime.datetime.now()} Failed getting liked tweets by CashApp: {e}')
                 if i==len(USERNAMES)-1:
                     print(f'{datetime.datetime.now()} Failed to search for tweets using any account, exiting...')
                     sys.exit(1)
                 else:
                     print('Trying with another account...')
-
+        
+        # Search for tweets that contain "drop" or "must follow"
+        final_list = []
+        for tweet in cashapp_likes.data:
+            # If the tweet contains "drop" or "must follow", then add to giveaway tweet list
+            if "drop" in tweet.text.lower() or "must follow" in tweet.text.lower():
+                final_list.append(tweet)
+        
         # Loop through the tweets and process them
-        for giveaway_tweet in tweets.data:
+        for giveaway_tweet in final_list:
             print(giveaway_tweet.text)
             # Get user mentions
             mentions = findMentions(giveaway_tweet.text)
@@ -244,24 +269,24 @@ def main_program():
                             # Follow mentioned user
                             followAccount(Clients[j], USERNAMES[j], mention)
                     # Follow author of giveaway tweet
-                    followAccount(Clients[i], USERNAMES[i], usernameFromID(Clients[i], giveaway_tweet.author_id))
+                    author_usename = usernameFromID(Clients[i], giveaway_tweet.author_id)
+                    followAccount(Clients[i], username, author_usename)
                     # Retweet the giveaway tweet
-                    print(USERNAMES[i])
                     Clients[i].retweet(giveaway_tweet.id,user_auth=True)
-                    print(f'Retweeted using: {USERNAMES[i]}')
+                    print(f'Retweeted using: {username}')
                     # Like the giveaway tweet
                     Clients[i].like(giveaway_tweet.id,user_auth=True)
                     print(f'Liked using: {username}')
                     if WORDED_REPLIES:
                         # Reply to the giveaway tweet with a worded reply
-                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"{current_replies[i]} {mentions} {hashtags} ${CASHTAGS[i]}", user_auth=True)
-                        print(f'{USERNAMES[i]} reply: {current_replies[i]} {mentions} {hashtags} ${CASHTAGS[i]}')
+                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"{current_replies[i]} {mentions} @{author_usename} {hashtags} ${CASHTAGS[i]}", user_auth=True)
+                        print(f'{username} reply: {current_replies[i]} {mentions} @{author_usename} {hashtags} ${CASHTAGS[i]}')
                     else:
                         # Reply to the giveaway tweet without a worded reply
-                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"{mentions} {hashtags} ${CASHTAGS[i]}", user_auth=True)
-                        print(f'{USERNAMES[i]} reply: {mentions} {hashtags} ${CASHTAGS[i]}')
+                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"{mentions} @{author_usename} {hashtags} ${CASHTAGS[i]}", user_auth=True)
+                        print(f'{username} reply: {mentions} @{author_usename} {hashtags} ${CASHTAGS[i]}')
                 else:
-                    print(f'{USERNAMES[i]} already replied to this tweet, moving on...')
+                    print(f'{username} already replied to this tweet, moving on...')
             # Sleep for a bit before next tweet
             sleep(random.uniform(1,5))
         # Sleep for a bit before rechecking for new giveaways
