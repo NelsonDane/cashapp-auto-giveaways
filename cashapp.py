@@ -10,7 +10,7 @@ import tweepy
 import random
 import datetime
 from replies import replies
-from searches import searches
+#from searches import searches
 from time import sleep
 from dotenv import load_dotenv
 
@@ -94,10 +94,12 @@ def followAccount(client, currentUsername, usernameToFollow):
     # Check to see if it is in the following list, following if it isn't
     found = False
     for follow in following.data:
+        # If the user is already following, set found to true and break out of loop
         if follow.username == usernameToFollow:
             print(f'{currentUsername} is already following {usernameToFollow}')
             found = True
             break
+    # If not found in following list, follow the user
     if not found:
         try:
             client.follow_user(target_user_id=followID, user_auth=True)
@@ -107,13 +109,16 @@ def followAccount(client, currentUsername, usernameToFollow):
 
 # Function to convert handle into ID
 def idFromUsername(client, username):
+    # Get user ID and return it
     try:
         id = client.get_user(username=username,tweet_fields=['id'])
         return id.data.id
     except Exception as e:
         print(f'Error getting ID from {username}: {e}')
 
+# Function to get the username from the ID
 def usernameFromID(client, id):
+    # Get user username and return it
     try:
         username = client.get_user(id=id,user_fields=['username'])
         return username.data.username
@@ -293,7 +298,7 @@ def main_program():
         print(f'All finished, sleeping for {CHECK_INTERVAL_SECONDS} seconds...')
         sleep(CHECK_INTERVAL_SECONDS)
 
-# Run the main program if it's the correct time
+# Run the main program
 try:
     main_program()
 
