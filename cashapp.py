@@ -240,17 +240,18 @@ def main_program():
                     if mentions:
                         for mention in mentionsList:
                             # Set index for easy use
-                            i = mentionsList.index(mention)
+                            j = mentionsList.index(mention)
                             # Follow mentioned user
-                            followAccount(Clients[i], username, mention)
+                            followAccount(Clients[j], USERNAMES[j], mention)
                     # Follow author of giveaway tweet
-                    followAccount(Clients[i], username, usernameFromID(Clients[i], giveaway_tweet.author_id))
+                    followAccount(Clients[i], USERNAMES[i], usernameFromID(Clients[i], giveaway_tweet.author_id))
                     # Retweet the giveaway tweet
+                    print(USERNAMES[i])
                     Clients[i].retweet(giveaway_tweet.id,user_auth=True)
                     print(f'Retweeted using: {USERNAMES[i]}')
                     # Like the giveaway tweet
                     Clients[i].like(giveaway_tweet.id,user_auth=True)
-                    print(f'Liked using: {USERNAMES[i]}')
+                    print(f'Liked using: {username}')
                     if WORDED_REPLIES:
                         # Reply to the giveaway tweet with a worded reply
                         Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=f"{current_replies[i]} {mentions} {hashtags} ${CASHTAGS[i]}", user_auth=True)
