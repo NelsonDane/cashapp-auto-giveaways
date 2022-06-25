@@ -6,18 +6,9 @@ import tweepy
 import random
 import datetime
 from replies import replies
-from searches import searches
 from time import sleep
 from dotenv import load_dotenv
 import pytextnow as pytn
-
-# Obtain username from https://www.textnow.com/messaging -> settings
-USERNAME = os.environ['username']
-PHONE = os.environ['number']
-SID = os.environ['SID']
-CSRF = os.environ['csrf']
-
-PYclient = pytn.Client(USERNAME, sid_cookie = SID, csrf_cookie = CSRF)
 
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
@@ -68,6 +59,22 @@ if len(USERNAMES) > len(replies):
 
 # Get check interval, defaulting to 60 seconds
 CHECK_INTERVAL_SECONDS = float(os.environ.get("CHECK_INTERVAL_SECONDS", "60"))
+
+# Get worded replies boolean, defaulting to False
+PYTEXTNOW = os.environ.get("PYTEXTNOW", False)
+# Because it imports as string, convert to bool
+if type(PYTEXTNOW) == str and (PYTEXTNOW.lower()).replace(" ","") == 'true':
+    PYTEXTNOW = True
+else:
+    PYTEXTNOW = False
+
+if PYTEXTNOW:
+    # Obtain username from https://www.textnow.com/messaging -> settings
+    USERNAME = os.environ['USERNAME']
+    PHONE = os.environ['NUMBER']
+    SID = os.environ['SID']
+    CSRF = os.environ['CSRF']
+    PYclient = pytn.Client(USERNAME, sid_cookie = SID, csrf_cookie = CSRF)
 
 # Validation
 # Make sure the number of bearer/consumer/acess tokens (twitter accounts) and cashtags match
@@ -250,9 +257,10 @@ def main_program():
         final_list = []
         for tweet in cashapp_likes.data:
             # If the tweet contains "drop" or "must follow", then add to giveaway tweet list
-            if "drop" in tweet.text.lower() or "must follow" in tweet.text.lower() or "partnered" in tweet.text.lower() or "your $Cashtag" in tweet.text.lower() or "below" in tweet.text.lower() or "partner" in tweet.text.lower() or "giveaway" in tweet.text.lower() or "give away" in tweet.text.lower() or "chance to win" in tweet.text.lower() :
+            if "drop" in tweet.text.lower() or "must follow" in tweet.text.lower() or "partnered" in tweet.text.lower() or "your $cashtag" in tweet.text.lower() or "below" in tweet.text.lower() or "partner" in tweet.text.lower() or "giveaway" in tweet.text.lower() or "give away" in tweet.text.lower() or "chance to win" in tweet.text.lower() :
                 final_list.append(tweet)
-                PYclient.send_sms(PHONE, "CashApp Giveaway Tweet Found!!")
+                if PYTEXTNOW:
+                    PYclient.send_sms(PHONE, "CashApp Giveaway Tweet Found!!")
 
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
