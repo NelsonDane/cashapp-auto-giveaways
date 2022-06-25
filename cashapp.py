@@ -1,9 +1,6 @@
 # Nelson Dane
 # Python bot to like, retweet, and reply to cashapp giveaways with a user's cashtag
 
-# To Do:
-# Allow custom searches
-
 # Importing the necessary modules
 import os
 import sys
