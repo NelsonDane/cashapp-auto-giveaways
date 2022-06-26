@@ -118,12 +118,21 @@ def followAccount(client, currentUsername, usernameToFollow):
     following = client.get_users_following(id=userID)
     # Check to see if it is in the following list, following if it isn't
     found = False
-    for follow in following.data:
-        if follow.username == usernameToFollow:
-            print(f'{currentUsername} is already following {usernameToFollow}')
-            found = True
-            break
-    if not found:
+    if following is not None:
+        for follow in following.data:
+            if follow.username == usernameToFollow:
+                print(f'{currentUsername} is already following {usernameToFollow}')
+                found = True
+                break
+        if not found:
+            try:
+                client.follow_user(target_user_id=followID, user_auth=True)
+                print(f'{currentUsername} just followed {usernameToFollow}')
+            except Exception as e:
+                print(
+                    f'Error following {usernameToFollow} with {currentUsername}: {e}')
+    else:
+        # If following is None, then just follow the user
         try:
             client.follow_user(target_user_id=followID, user_auth=True)
             print(f'{currentUsername} just followed {usernameToFollow}')
