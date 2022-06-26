@@ -217,7 +217,7 @@ def main_program():
 
     # Declare cached tweets list
     cached_tweets = []
-    
+
     # Run search forever
     while True:
         # Update recent tweets from each user
@@ -231,9 +231,11 @@ def main_program():
             recent_tweets = client.get_users_tweets(id=idFromUsername(
                 client, USERNAMES[i]), user_auth=True, tweet_fields=['conversation_id'])
             # Create list in list: list-ception
-            for tweet in (recent_tweets.data):
-                sub_recent_tweets.append(tweet.conversation_id)
-            recent_tweet_ids.append(sub_recent_tweets)
+            # Make sure recent_tweets isn't None
+            if recent_tweets is not None:
+                for tweet in (recent_tweets.data):
+                    sub_recent_tweets.append(tweet.conversation_id)
+                recent_tweet_ids.append(sub_recent_tweets)
 
         # Search for liked tweets by CashApp
         for username in USERNAMES:
