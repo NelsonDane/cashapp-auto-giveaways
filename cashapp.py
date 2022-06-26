@@ -12,6 +12,7 @@ from replies import replies
 from time import sleep
 from dotenv import load_dotenv
 
+
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
 
@@ -255,8 +256,6 @@ def main_program():
         final_list = []
         instances = ['drop','must follow','partnered','your $cashtag','below','partner', 'giveaway', 'give away','chance to win','must follow to win', 'celebrate']
         for tweet in cashapp_likes.data:
-            # If the tweet contains "drop" or "must follow", then add to giveaway tweet list
-            #if "drop" in tweet.text.lower() or "must follow" in tweet.text.lower() or "partnered" in tweet.text.lower() or "your $cashtag" in tweet.text.lower() or "below" in tweet.text.lower() or "partner" in tweet.text.lower() or "giveaway" in tweet.text.lower() or "give away" in tweet.text.lower() or "chance to win" in tweet.text.lower():
             if any(x in tweet.text.lower() for x in instances):
                 if(tweet.id not in cached_tweets):
                     final_list.append(tweet)
