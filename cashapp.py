@@ -9,6 +9,7 @@ import tweepy
 import random
 import datetime
 import pytextnow as pytn
+from keep_alive import keep_alive
 from replies import replies
 from time import sleep
 from dotenv import load_dotenv
@@ -193,6 +194,7 @@ def findMentions(tweet):
 
 
 def main_program():
+    keep_alive()
     run_main = False
     while not run_main:
         # Kill the program if the time is outside of the start and end times
@@ -314,9 +316,9 @@ def main_program():
                     else:
                         # Reply to the giveaway tweet without a worded reply
                         Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id,
-                                                text=f" ${CASHTAGS[i]}{hashtags} {mentions} @{author_usename}", user_auth=True)
+                                                text=f" ${CASHTAGS[i]} {hashtags} {mentions} @{author_usename}", user_auth=True)
                         print(
-                            f'{username} reply: {mentions} @{author_usename} {hashtags} ${CASHTAGS[i]}')
+                            f'{username} reply: {mentions}  @{author_usename}  {hashtags}  ${CASHTAGS[i]}')
                 else:
                     print(f'{username} already replied to this tweet, moving on...')
             # Sleep for a bit before next tweet
