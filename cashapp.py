@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
-cached_tweets = []
+
 # Load the .env file
 load_dotenv()
 
@@ -35,7 +35,7 @@ else:
         raise Exception(
             f"Twitter authentication variables are not the same length.\nBEARER_TOKENS: {len(BEARER_TOKENS)}\nCONSUMER_KEYS: {len(CONSUMER_KEYS)}\nCONSUMER_SECRETS: {len(CONSUMER_SECRETS)}\nACCESS_TOKENS: {len(ACCESS_TOKENS)}\nACCESS_TOKEN_SECRETS: {len(ACCESS_TOKEN_SECRETS)}")
 
-
+# Set the cashtags
 if not os.environ["CASHTAGS"]:
     raise Exception("Please specify the cashtags in the .env file")
 else:
@@ -77,6 +77,7 @@ if type(PYTEXTNOW) == str and (PYTEXTNOW.lower()).replace(" ", "") == 'true':
 else:
     PYTEXTNOW = False
 
+# Setup PyTextNow, if enabled
 if PYTEXTNOW:
     # Obtain username from https://www.textnow.com/messaging -> settings
     USERNAME = os.environ['USERNAME']
@@ -84,6 +85,7 @@ if PYTEXTNOW:
     SID = os.environ['SID']
     CSRF = os.environ['CSRF']
     PYclient = pytn.Client(USERNAME, sid_cookie=SID, csrf_cookie=CSRF)
+
 # Validation
 # Make sure the number of bearer/consumer/acess tokens (twitter accounts) and cashtags match
 if len(BEARER_TOKENS) != len(CASHTAGS) != len(CONSUMER_KEYS) != len(CONSUMER_SECRETS) != len(ACCESS_TOKENS) != len(ACCESS_TOKEN_SECRETS) != len(USERNAMES):
@@ -104,9 +106,9 @@ for i in range(len(USERNAMES)):
 if START_TIME > END_TIME:
     raise Exception("Start time must be before end time")
 
+# Functions
+
 # Function to follow Twitter accounts
-
-
 def followAccount(client, currentUsername, usernameToFollow):
     # Get the user ID from the username
     userID = idFromUsername(client, currentUsername)
@@ -130,8 +132,6 @@ def followAccount(client, currentUsername, usernameToFollow):
                 f'Error following {usernameToFollow} with {currentUsername}: {e}')
 
 # Function to convert handle into ID
-
-
 def idFromUsername(client, username):
     try:
         id = client.get_user(username=username, tweet_fields=['id'])
@@ -139,7 +139,7 @@ def idFromUsername(client, username):
     except Exception as e:
         print(f'Error getting ID from {username}: {e}')
 
-
+# Function to get username from ID
 def usernameFromID(client, id):
     try:
         username = client.get_user(id=id, user_fields=['username'])
@@ -148,8 +148,6 @@ def usernameFromID(client, id):
         print(f'Error getting username from {id}: {e}')
 
 # Function to find mentions and hastags
-
-
 def findHashtags(tweet):
     # Start found at false
     hashFound = False
@@ -169,7 +167,7 @@ def findHashtags(tweet):
     # Hacky, but add space in front of #, then remove trailing whitespace and return
     return (hashtags.replace("#", " #")).strip()
 
-
+# Function to find mentions
 def findMentions(tweet):
     # Start found at false
     atFound = False
@@ -190,8 +188,6 @@ def findMentions(tweet):
     return (usernames.replace("@", " @")).strip()
 
 # Main program
-
-
 def main_program():
     run_main = False
     while not run_main:
@@ -219,6 +215,9 @@ def main_program():
         i = Clients.index(client)
         followAccount(client, USERNAMES[i], "CashApp")
 
+    # Declare cached tweets list
+    cached_tweets = []
+    
     # Run search forever
     while True:
         # Update recent tweets from each user
@@ -236,6 +235,7 @@ def main_program():
                 sub_recent_tweets.append(tweet.conversation_id)
             recent_tweet_ids.append(sub_recent_tweets)
 
+        # Search for liked tweets by CashApp
         for username in USERNAMES:
             try:
                 # Set index for easy use
