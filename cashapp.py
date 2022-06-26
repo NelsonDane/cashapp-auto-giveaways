@@ -9,7 +9,6 @@ import tweepy
 import random
 import datetime
 import pytextnow as pytn
-from keep_alive import keep_alive
 from replies import replies
 from time import sleep
 from dotenv import load_dotenv
@@ -194,7 +193,6 @@ def findMentions(tweet):
 
 
 def main_program():
-    keep_alive()
     run_main = False
     while not run_main:
         # Kill the program if the time is outside of the start and end times
