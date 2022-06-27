@@ -12,7 +12,6 @@ from replies import replies
 from time import sleep
 from dotenv import load_dotenv
 
-
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
 
@@ -41,7 +40,6 @@ if not os.environ["CASHTAGS"]:
 else:
     # Set the cashtags
     CASHTAGS = os.environ["CASHTAGS"].split(",")
-
 # Set the usernames
 if not os.environ["USERNAMES"]:
     raise Exception("Please specify the usernames in the .env file")
@@ -287,9 +285,11 @@ def main_program():
                     # Follow author of giveaway tweet
                     author_usename = usernameFromID(
                         Clients[i], giveaway_tweet.author_id)
+                    print()
                     followAccount(Clients[i], username, author_usename)
                     # Retweet the giveaway tweet
                     Clients[i].retweet(giveaway_tweet.id, user_auth=True)
+                    
                     print(f'Retweeted using: {username}')
                     # Like the giveaway tweet
                     Clients[i].like(giveaway_tweet.id, user_auth=True)
@@ -302,10 +302,9 @@ def main_program():
                             f'{username} reply: {current_replies[i]} {mentions} @{author_usename} {hashtags} ${CASHTAGS[i]}')
                     else:
                         # Reply to the giveaway tweet without a worded reply
-                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id,
-                                                text=f" ${CASHTAGS[i]} {hashtags} {mentions} @{author_usename}", user_auth=True)
-                        print(
-                            f'{username} reply: {mentions}  @{author_usename}  {hashtags}  ${CASHTAGS[i]}')
+                        Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id,text=f" ${CASHTAGS[i]} {hashtags} {mentions} @{author_usename}", user_auth=True)
+                        print(f'{username} reply: {mentions}  @{author_usename}  {hashtags}  ${CASHTAGS[i]}')
+                        print()
                 else:
                     print(f'{username} already replied to this tweet, moving on...')
             # Sleep for a bit before next tweet
