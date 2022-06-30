@@ -233,14 +233,11 @@ def main_program():
                 # Get liked tweets by CashApp
                 cashapp_likes = Clients[i].get_liked_tweets(
                     id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
-                print()
-                print("Searching for liked tweets by CashApp...")
-                print()
+                print(f'\nSearching for liked tweets by CashApp...\n')
                 # If the search was successful, break out of the loop
                 break
             except Exception as e:
-                print(
-                    f'{datetime.datetime.now()} Failed getting liked tweets by CashApp: {e}')
+                print(f'{datetime.datetime.now()} Failed getting liked tweets by CashApp: {e}')
                 if i == len(USERNAMES)-1:
                     print(
                         f'{datetime.datetime.now()} Failed to search for tweets using any account, exiting...')
@@ -252,9 +249,8 @@ def main_program():
         final_list = []
         instances = ['drop','must follow','partnered','your $cashtag','below','partner', 'giveaway', 'give away','chance to win','must follow to win', 'celebrate']
         for tweet in cashapp_likes.data:
-            if any(x in tweet.text.lower() for x in instances):
-                if(tweet.id not in cached_tweets):
-                    final_list.append(tweet)
+            if any(x in tweet.text.lower() for x in instances) and (tweet.id not in cached_tweets):
+              final_list.append(tweet)
 
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
@@ -309,9 +305,7 @@ def main_program():
             sleep(random.uniform(1, 5))
 
         # Sleep for a bit before rechecking for new giveaways
-        print()
-        print(f'All finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...')
-        print()
+        print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\n')
         sleep(CHECK_INTERVAL_SECONDS)
 
 
