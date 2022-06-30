@@ -30,9 +30,9 @@ else:
     ACCESS_TOKENS = os.environ["ACCESS_TOKENS"].split(",")
     ACCESS_TOKEN_SECRETS = os.environ["ACCESS_TOKEN_SECRETS"].split(",")
 
-    if(not (len(BEARER_TOKENS) == len(CONSUMER_KEYS) == len(CONSUMER_SECRETS) == len(ACCESS_TOKENS) == len(ACCESS_TOKEN_SECRETS))):
-        raise Exception(
-            f"Twitter authentication variables are not the same length.\nBEARER_TOKENS: {len(BEARER_TOKENS)}\nCONSUMER_KEYS: {len(CONSUMER_KEYS)}\nCONSUMER_SECRETS: {len(CONSUMER_SECRETS)}\nACCESS_TOKENS: {len(ACCESS_TOKENS)}\nACCESS_TOKEN_SECRETS: {len(ACCESS_TOKEN_SECRETS)}")
+    # Check Twitter authentication are all the same length, rasie exception if not the case
+    if (not (len(BEARER_TOKENS) == len(CONSUMER_KEYS) == len(CONSUMER_SECRETS) == len(ACCESS_TOKENS) == len(ACCESS_TOKEN_SECRETS))):
+        raise Exception(f"Twitter authentication variables are not the same length.\nBEARER_TOKENS: {len(BEARER_TOKENS)}\nCONSUMER_KEYS: {len(CONSUMER_KEYS)}\nCONSUMER_SECRETS: {len(CONSUMER_SECRETS)}\nACCESS_TOKENS: {len(ACCESS_TOKENS)}\nACCESS_TOKEN_SECRETS: {len(ACCESS_TOKEN_SECRETS)}")
 
 # Set the cashtags
 if not os.environ["CASHTAGS"]:
@@ -70,8 +70,7 @@ CHECK_INTERVAL_SECONDS = float(os.environ.get("CHECK_INTERVAL_SECONDS", "60"))
 # Validation
 # Make sure the number of bearer/consumer/acess tokens (twitter accounts) and cashtags match
 if len(BEARER_TOKENS) != len(CASHTAGS) != len(CONSUMER_KEYS) != len(CONSUMER_SECRETS) != len(ACCESS_TOKENS) != len(ACCESS_TOKEN_SECRETS) != len(USERNAMES):
-    raise Exception(
-        "The number of usernames and cashtags must match the number of Twitter accounts")
+    raise Exception("The number of usernames and cashtags must match the number of Twitter accounts")
 
 # Remove whitespaces from API tokens and keys, and $/@ from cashtags and usernames
 for i in range(len(USERNAMES)):
@@ -185,8 +184,7 @@ def main_program():
         if (datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME):
             run_main = True
         else:
-            print(
-                f'{datetime.datetime.now()} Not running because it is not between {START_TIME} and {END_TIME}')
+            print(f'{datetime.datetime.now()} Not running because it is not between {START_TIME} and {END_TIME}')
             sleep(CHECK_INTERVAL_SECONDS)
 
     # Create client for each Twitter account and make sure they follow @CashApp
@@ -312,8 +310,7 @@ def main_program():
 
         # Sleep for a bit before rechecking for new giveaways
         print()
-        print(
-            f'All finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...')
+        print(f'All finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...')
         print()
         sleep(CHECK_INTERVAL_SECONDS)
 
