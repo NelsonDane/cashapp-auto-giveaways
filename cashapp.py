@@ -20,8 +20,7 @@ load_dotenv()
 
 # Raise error if needed variables are not specified
 if not os.environ["BEARER_TOKENS"] or not os.environ["CONSUMER_KEYS"] or not os.environ["CONSUMER_SECRETS"] or not os.environ["ACCESS_TOKENS"] or not os.environ["ACCESS_TOKEN_SECRETS"]:
-    raise Exception(
-        "Please specify the needed variables for Twitter authentication in the .env file")
+    raise Exception("Please specify the needed variables for Twitter authentication in the .env file")
 else:
     # Set the twitter authentication variables
     BEARER_TOKENS = os.environ["BEARER_TOKENS"].split(",")
@@ -109,16 +108,14 @@ def followAccount(client, currentUsername, usernameToFollow):
                 client.follow_user(target_user_id=followID, user_auth=True)
                 print(f'{currentUsername} just followed {usernameToFollow}')
             except Exception as e:
-                print(
-                    f'Error following {usernameToFollow} with {currentUsername}: {e}')
+                print(f'Error following {usernameToFollow} with {currentUsername}: {e}')
     else:
         # If following is None, then just follow the user
         try:
             client.follow_user(target_user_id=followID, user_auth=True)
             print(f'{currentUsername} just followed {usernameToFollow}')
         except Exception as e:
-            print(
-                f'Error following {usernameToFollow} with {currentUsername}: {e}')
+            print(f'Error following {usernameToFollow} with {currentUsername}: {e}')
 
 # Function to convert handle into ID
 def idFromUsername(client, username):
@@ -239,8 +236,7 @@ def main_program():
             except Exception as e:
                 print(f'{datetime.datetime.now()} Failed getting liked tweets by CashApp: {e}')
                 if i == len(USERNAMES)-1:
-                    print(
-                        f'{datetime.datetime.now()} Failed to search for tweets using any account, exiting...')
+                    print(f'{datetime.datetime.now()} Failed to search for tweets using any account, exiting...')
                     sys.exit(1)
                 else:
                     print('Trying with another account...')
@@ -292,8 +288,7 @@ def main_program():
                         # Reply to the giveaway tweet with a worded reply
                         Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id,
                                                 text=f"{current_replies[i]} {mentions} @{author_usename} {hashtags} ${CASHTAGS[i]}", user_auth=True)
-                        print(
-                            f'{username} reply: {current_replies[i]} {mentions} @{author_usename} {hashtags} ${CASHTAGS[i]}')
+                        print(f'{username} reply: {current_replies[i]} {mentions} @{author_usename} {hashtags} ${CASHTAGS[i]}')
                     else:
                         # Reply to the giveaway tweet without a worded reply
                         Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id,text=f" ${CASHTAGS[i]} {hashtags} {mentions} @{author_usename}", user_auth=True)
