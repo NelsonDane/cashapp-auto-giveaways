@@ -2,9 +2,11 @@
 
 # Build from alpine to keep the image small
 FROM alpine:latest
+# Set default timezone
+ENV TZ=America/New_York
 
-# Install python and pip
-RUN apk add --no-cache py3-pip
+# Install python, pip, and tzdata
+RUN apk add --no-cache py3-pip tzdata
 
 # Grab needed files
 WORKDIR /app
