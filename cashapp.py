@@ -2,6 +2,7 @@
 # Python bot to like, retweet, and reply to cashapp giveaways with a user's cashtag
 
 import os
+from re import M
 import sys
 import traceback
 import datetime
@@ -66,9 +67,17 @@ if (len(USERNAMES) > len(replies) and WORDED_REPLIES):
 # Get check interval, defaulting to 60 seconds
 CHECK_INTERVAL_SECONDS = float(os.environ.get("CHECK_INTERVAL_SECONDS", "60"))
 
+# See if manual tweet is specified
+if os.environ.get("MANUAL_TWEET"):
+    # Set manual tweet id
+    MANUAL_TWEET = os.environ.get("MANUAL_TWEET")
+else:
+    # Set manual tweet id to None
+    MANUAL_TWEET = None
+
 # Validation
-# Make sure the number of bearer/consumer/acess tokens (twitter accounts) and cashtags match
-if len(BEARER_TOKENS) != len(CASHTAGS) != len(CONSUMER_KEYS) != len(CONSUMER_SECRETS) != len(ACCESS_TOKENS) != len(ACCESS_TOKEN_SECRETS) != len(USERNAMES):
+# Make sure the number of bearer/consumer/acess tokens (twitter accounts), usernames, and cashtags match
+if len(BEARER_TOKENS) != len(CASHTAGS) != len(CONSUMER_KEYS) != len(CONSUMER_SECRETS) != len(ACCESS_TOKENS) != len(ACCESS_TOKEN_SECRETS) != len(USERNAMES) != len(CASHTAGS):
     raise Exception("The number of usernames and cashtags must match the number of Twitter accounts")
 
 # Remove whitespaces from API tokens and keys, and $/@ from cashtags and usernames
@@ -198,7 +207,7 @@ def main_program():
     for client in Clients:
         # Set index for easy use
         i = Clients.index(client)
-        followAccount(client, USERNAMES[i], "CashApp")
+        #followAccount(client, USERNAMES[i], "CashApp")
 
     # Declare cached tweets list
     cached_tweets = []
@@ -207,6 +216,8 @@ def main_program():
     while True:
         # Update recent tweets from each user
         recent_tweet_ids = []
+        # Set final list of tweets list
+        final_list = []
         for client in Clients:
             # Set index for easy use
             i = Clients.index(client)
@@ -222,31 +233,37 @@ def main_program():
                     sub_recent_tweets.append(tweet.conversation_id)
                 recent_tweet_ids.append(sub_recent_tweets)
 
-        # Search for liked tweets by CashApp
-        for username in USERNAMES:
-            try:
-                # Set index for easy use
-                i = USERNAMES.index(username)
-                # Get liked tweets by CashApp
-                cashapp_likes = Clients[i].get_liked_tweets(
-                    id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
-                print(f'\nSearching for liked tweets by CashApp...\n')
-                # If the search was successful, break out of the loop
-                break
-            except Exception as e:
-                print(f'{datetime.datetime.now()} Failed getting liked tweets by CashApp: {e}')
-                if i == len(USERNAMES)-1:
-                    print(f'{datetime.datetime.now()} Failed to search for tweets using any account, exiting...')
-                    sys.exit(1)
-                else:
-                    print('Trying with another account...')
-
-        # Search for tweets that contain "drop" or "must follow"
-        final_list = []
-        instances = ['drop','must follow','partnered','your $cashtag','below','partner', 'giveaway', 'give away','chance to win','must follow to win', 'celebrate']
-        for tweet in cashapp_likes.data:
-            if any(x in tweet.text.lower() for x in instances) and (tweet.id not in cached_tweets):
-              final_list.append(tweet)
+        # Search for liked tweets by CashApp if manual search is not enabled
+        if not MANUAL_TWEET:
+            for username in USERNAMES:
+                try:
+                    # Set index for easy use
+                    i = USERNAMES.index(username)
+                    # Get liked tweets by CashApp
+                    print(f'\nSearching for liked tweets by CashApp...\n')
+                    cashapp_likes = Clients[i].get_liked_tweets(
+                        id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
+                    # If the search was successful, break out of the loop
+                    break
+                except Exception as e:
+                    print(f'{datetime.datetime.now()} Failed getting liked tweets by CashApp: {e}')
+                    if i == len(USERNAMES)-1:
+                        print(f'{datetime.datetime.now()} Failed to search for tweets using any account, exiting...')
+                        sys.exit(1)
+                    else:
+                        print('Trying with another account...')
+        else:
+            # Use manual search
+            print(f'Manual Tweet ID set to: {MANUAL_TWEET}')
+            final_list = Clients[1].get_tweet(id=MANUAL_TWEET, tweet_fields=['author_id'], user_auth=True)
+            run_once = True
+        # Search for tweets that contain "drop" or "must follow" unless manual search is enabled
+        if not MANUAL_TWEET:
+            run_once = False
+            keywords = ['drop','must follow','partnered','your $cashtag','below','partner', 'giveaway', 'give away','chance to win','must follow to win', 'celebrate']
+            for tweet in cashapp_likes.data:
+                if any(x in tweet.text.lower() for x in keywords) and (tweet.id not in cached_tweets):
+                    final_list.append(tweet)
 
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
@@ -296,13 +313,20 @@ def main_program():
                         print()
                 else:
                     print(f'{username} already replied to this tweet, moving on...')
+            # If manual search is enabled, break out of the loop
+            if run_once:
+                break
             # Sleep for a bit before next tweet
             sleep(random.uniform(1, 5))
 
-        # Sleep for a bit before rechecking for new giveaways
-        print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\n')
-        sleep(CHECK_INTERVAL_SECONDS)
-
+        # If manual search is completed, then exit gracefully
+        if MANUAL_TWEET:
+            print('All finished, exiting...')
+            sys.exit(0)
+        else:
+            # Sleep for a bit before rechecking for new giveaways
+            print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\n')
+            sleep(CHECK_INTERVAL_SECONDS)
 
 # Run the main program if it's the correct time
 try:
