@@ -11,6 +11,7 @@ import datetime
 from replies import replies
 from time import sleep
 from dotenv import load_dotenv
+
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
 
