@@ -12,7 +12,6 @@ import datetime
 from replies import replies
 from time import sleep
 from dotenv import load_dotenv
-
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
 
@@ -109,7 +108,7 @@ def followAccount(client, currentUsername, usernameToFollow):
     if following is not None:
         for follow in following.data:
             if follow.username == usernameToFollow:
-                print(f'{currentUsername} is already following {usernameToFollow} {datetime.datetime.now()} ')
+                print(f'{currentUsername} is already following {usernameToFollow}\t\t{datetime.datetime.now()} ')
                 found = True
                 break
         if not found:
@@ -240,7 +239,7 @@ def main_program():
                     # Set index for easy use
                     i = USERNAMES.index(username)
                     # Get liked tweets by CashApp
-                    print(f'\nSearching for liked tweets by CashApp... {datetime.datetime.now()} \n')
+                    print(f'\nSearching for liked tweets by CashApp...\t\t {datetime.datetime.now()} \n')
                     cashapp_likes = Clients[i].get_liked_tweets(
                         id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
                     # If the search was successful, break out of the loop
@@ -325,7 +324,7 @@ def main_program():
                     except Exception as e:
                         print(f'{datetime.datetime.now()} Error replying to tweet with {username}: {e}')
                 else:
-                    print(f'{username} already replied to this tweet, moving on... {datetime.datetime.now()}')
+                    print(f'{username} already replied to this tweet, moving on... \t\t{datetime.datetime.now()}')
             # If manual search is enabled, break out of the loop
             if run_once:
                 break
@@ -338,7 +337,7 @@ def main_program():
             sys.exit(0)
         else:
             # Sleep for a bit before rechecking for new giveaways
-            print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes... {datetime.datetime.now()}')
+            print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\t\t {datetime.datetime.now()}')
             sleep(CHECK_INTERVAL_SECONDS)
 
 # Run the main program if it's the correct time
