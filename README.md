@@ -39,6 +39,7 @@ If configuring multiple Twitter accounts, seperate each value with a comma (no s
 - END_TIME: The time the bot should stop working (Default 9:00pm)
 - WORDED_REPLIES: Whether the bot should include a short message with each Tweet reply (Default False)
 - CHECK_INTERVAL_SECONDS: How often the bot should check for new giveaway Tweets. Don't set this too low or you'll run out of API requests (Default 900 seconds)
+- MANUAL_TWEET: The ID of the Tweet you want the bot to run on. This disables searches, running all accounts once on the given ID. Helpful for if you want to run the bot on a specific ID that wasn't found in the automatic search.
 
 ### Notes:
 - Because of how docker images/containers work, file edits (like editing the bot or updating the extension) are not immediately reflected in the container, even on a container restart because files are only imported when the base image is built. Because of this, you must stop and remove the container, rebuild the image, then remake the container for the changes to take affect.
@@ -48,6 +49,10 @@ If configuring multiple Twitter accounts, seperate each value with a comma (no s
 #### I get error 403 Forbidden
 
 Your generated credentials are not correct or out of order. Make sure you regenerated your Access Tokens and Access Token Secrets after setting Read/Write permissions for OAuth 1.0a.
+
+#### I get error 429 Too Many Requests
+
+You hit a rate limit on one of your accounts. Wait a while before trying to run the bot again.
 
 ## Features
 
