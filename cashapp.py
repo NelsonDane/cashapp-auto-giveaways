@@ -207,7 +207,7 @@ def main_program():
     for client in Clients:
         # Set index for easy use
         i = Clients.index(client)
-        #followAccount(client, USERNAMES[i], "CashApp")
+        followAccount(client, USERNAMES[i], "CashApp")
 
     # Declare cached tweets list
     cached_tweets = []
