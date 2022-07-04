@@ -43,6 +43,7 @@ If configuring multiple Twitter accounts, seperate each value with a comma (no s
 
 ### Notes:
 - Because of how docker images/containers work, file edits (like editing the bot or updating the extension) are not immediately reflected in the container, even on a container restart because files are only imported when the base image is built. Because of this, you must stop and remove the container, rebuild the image, then remake the container for the changes to take affect.
+- Another note for Docker, for some reason using quotes ("") around the env values breaks the bot. This doesn't affect the bot when it's ran directly on Windows or MacOS, so something to be aware of if taking the Docker route.
 
 ## FAQs
 
