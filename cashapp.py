@@ -338,7 +338,7 @@ def main_program():
             sys.exit(0)
         else:
             # Sleep for a bit before rechecking for new giveaways
-            print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes... {datetime.datetime.now()} \n')
+            print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes... {datetime.datetime.now()}')
             sleep(CHECK_INTERVAL_SECONDS)
 
 # Run the main program if it's the correct time
