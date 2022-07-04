@@ -2,7 +2,6 @@
 # Python bot to like, retweet, and reply to cashapp giveaways with a user's cashtag
 
 import os
-from re import M
 import sys
 import traceback
 import datetime
