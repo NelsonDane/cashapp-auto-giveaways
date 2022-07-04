@@ -66,6 +66,7 @@ You hit a rate limit on one of your accounts. Wait a while before trying to run 
 - Searching for tweets
 - Custom sleep times
 - Gathering recent user Tweets to avoid replying twice
+- Running the bot once on a custom Tweet ID
 
 ### Maybe working
 - Running the bot at certain times of the day to save on API requests only works in Docker
@@ -73,5 +74,5 @@ You hit a rate limit on one of your accounts. Wait a while before trying to run 
 ### Upcoming (Hopefully)
 - Alerts for new giveaway tweets
 - Alerts for errors
-- Multiple custom searches
 - Docker Hub repo
+- More error catching
