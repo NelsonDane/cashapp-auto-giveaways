@@ -32,6 +32,9 @@ else:
     # Check Twitter authentication are all the same length, rasie exception if not the case
     if (not (len(BEARER_TOKENS) == len(CONSUMER_KEYS) == len(CONSUMER_SECRETS) == len(ACCESS_TOKENS) == len(ACCESS_TOKEN_SECRETS))):
         raise Exception(f"Twitter authentication variables are not the same length.\nBEARER_TOKENS: {len(BEARER_TOKENS)}\nCONSUMER_KEYS: {len(CONSUMER_KEYS)}\nCONSUMER_SECRETS: {len(CONSUMER_SECRETS)}\nACCESS_TOKENS: {len(ACCESS_TOKENS)}\nACCESS_TOKEN_SECRETS: {len(ACCESS_TOKEN_SECRETS)}")
+    else:
+      print(f'Number of CashApp/Twitter Accounts: {len(CONSUMER_KEYS)}\n')
+
 
 # Set the cashtags
 if not os.environ["CASHTAGS"]:
@@ -60,7 +63,7 @@ else:
 
 # Make sure there's enough replies for each account
 if (len(USERNAMES) > len(replies) and WORDED_REPLIES):
-    print(f'Not enough replies for all Twitter accounts, disabling replies {datetime.datetime.now()}')
+    print(f'Not enough replies for all Twitter accounts, disabling replies \t\t\t{datetime.datetime.now()}')
     WORDED_REPLIES = False
 
 # Get check interval, defaulting to 60 seconds
@@ -108,22 +111,22 @@ def followAccount(client, currentUsername, usernameToFollow):
     if following is not None:
         for follow in following.data:
             if follow.username == usernameToFollow:
-                print(f'{currentUsername} is already following {usernameToFollow}\t\t{datetime.datetime.now()} ')
+                print(f'{currentUsername} is already following {usernameToFollow}\t\t\t{datetime.datetime.now()} ')
                 found = True
                 break
         if not found:
             try:
                 client.follow_user(target_user_id=followID, user_auth=True)
-                print(f'{currentUsername} just followed {usernameToFollow} {datetime.datetime.now()} ')
+                print(f'{currentUsername} just followed {usernameToFollow} \t\t\t {datetime.datetime.now()} ')
             except Exception as e:
-                print(f'Error following {usernameToFollow} with {currentUsername}: {e} {datetime.datetime.now()} ')
+                print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()} ')
     else:
         # If following is None, then just follow the user
         try:
             client.follow_user(target_user_id=followID, user_auth=True)
-            print(f'{currentUsername} just followed {usernameToFollow} {datetime.datetime.now()} ')
+            print(f'{currentUsername} just followed {usernameToFollow} \t\t\t{datetime.datetime.now()} ')
         except Exception as e:
-            print(f'Error following {usernameToFollow} with {currentUsername}: {e} {datetime.datetime.now()} ')
+            print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()} ')
 
 # Function to convert handle into ID
 def idFromUsername(client, username):
@@ -131,7 +134,7 @@ def idFromUsername(client, username):
         id = client.get_user(username=username, tweet_fields=['id'])
         return id.data.id
     except Exception as e:
-        print(f'Error getting ID from {username}: {e} {datetime.datetime.now()} ')
+        print(f'Error getting ID from {username}: {e} \t\t\t {datetime.datetime.now()} ')
 
 # Function to get username from ID
 def usernameFromID(client, id):
@@ -139,7 +142,7 @@ def usernameFromID(client, id):
         username = client.get_user(id=id, user_fields=['username'])
         return username.data.username
     except Exception as e:
-        print(f'Error getting username from {id}: {e} {datetime.datetime.now()} ')
+        print(f'Error getting username from {id}: {e} \t\t\t{datetime.datetime.now()} ')
 
 # Function to find mentions and hastags
 def findHashtags(tweet):
@@ -189,7 +192,7 @@ def main_program():
         if (datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME):
             run_main = True
         else:
-            print(f'Not running because it is not between {START_TIME} and {END_TIME} {datetime.datetime.now()}')
+            print(f'Not running because it is not between {START_TIME} and {END_TIME} \t\t {datetime.datetime.now()}')
             sleep(CHECK_INTERVAL_SECONDS)
 
     # Create client for each Twitter account and make sure they follow @CashApp
@@ -253,7 +256,7 @@ def main_program():
                         print(f'Trying with another account... {datetime.datetime.now()} ')
         else:
             # Use manual search
-            print(f'Manual Tweet ID set to: {MANUAL_TWEET} {datetime.datetime.now()} ')
+            print(f'Manual Tweet ID set to: {MANUAL_TWEET} \t\t\t {datetime.datetime.now()} ')
             final_list = Clients[1].get_tweet(id=MANUAL_TWEET, tweet_fields=['author_id'], user_auth=True)
             run_once = True
         # Search for tweets that contain "drop" or "must follow" unless manual search is enabled
@@ -264,7 +267,7 @@ def main_program():
                 if any(x in tweet.text.lower() for x in keywords) and (tweet.id not in cached_tweets):
                     final_list.append(tweet)
             if final_list == []:
-                print(f'No tweets found that match the keywords {datetime.datetime.now()}')
+                print(f'No tweets found that match the keywords \t\t\t{datetime.datetime.now()}')
 
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
@@ -324,7 +327,7 @@ def main_program():
                     except Exception as e:
                         print(f'{datetime.datetime.now()} Error replying to tweet with {username}: {e}')
                 else:
-                    print(f'{username} already replied to this tweet, moving on... \t\t{datetime.datetime.now()}')
+                    print(f'{username} already replied to this tweet, moving on... \t\t\t{datetime.datetime.now()}')
             # If manual search is enabled, break out of the loop
             if run_once:
                 break
@@ -337,7 +340,7 @@ def main_program():
             sys.exit(0)
         else:
             # Sleep for a bit before rechecking for new giveaways
-            print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\t\t {datetime.datetime.now()}')
+            print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\t\t\t {datetime.datetime.now()}')
             sleep(CHECK_INTERVAL_SECONDS)
 
 # Run the main program if it's the correct time
