@@ -36,7 +36,6 @@ else:
     else:
       print(f'Number of CashApp/Twitter Accounts: {len(CONSUMER_KEYS)}\n')
 
-
 # Set the cashtags
 if not os.environ["CASHTAGS"]:
     raise Exception("Please specify the cashtags in the .env file")
@@ -144,7 +143,11 @@ def followAccount(client, currentUsername, usernameToFollow):
     followID = idFromUsername(client, usernameToFollow)
     # Check to see if account is following already
     # Get following list
-    following = client.get_users_following(id=userID)
+    try:
+        following = client.get_users_following(id=userID)
+    except tweepy.errors.TooManyRequests as e:
+        print(f"Rate limit exceeded on {currentUsername}: {e} \t\t{datetime.datetime.now()}")
+        return
     # Check to see if it is in the following list, following if it isn't
     found = False
     if following is not None:
@@ -220,8 +223,10 @@ def findMentions(tweet):
         # If none above is true, then add the letter to the username
         elif atFound:
             usernames += letter
-    # Hacky, but add space in front of #, then remove trailing whitespace and return
-    return (usernames.replace("@", " @")).strip()
+    # Hacky, but add space in front of @, then remove trailing whitespace and return
+    found = (usernames.replace("@", " @")).strip()
+    final = (found.replace(",", "")).replace(".", "")
+    return final
 
 # Main program
 def main_program():
@@ -249,10 +254,10 @@ def main_program():
         for client in Clients:
             # Set index for easy use
             i = Clients.index(client)
-            followAccount(client, USERNAMES[i], "CashApp")
-
-    # Declare cached tweets list
-    #cached_tweets = []
+            try:
+                followAccount(client, USERNAMES[i], "CashApp")
+            except tweepy.errors.TooManyRequests as e:
+                print(f'Error following CashApp with {USERNAMES[i]}: {e} \t\t\t{datetime.datetime.now()} ')
 
     # Initialize cached tweets file
     cached_tweets_init()
@@ -281,17 +286,35 @@ def main_program():
         # Search for liked tweets by CashApp if manual search is not enabled
         if not MANUAL_TWEET:
             for username in USERNAMES:
+                # Search for liked tweets by CashApp
                 try:
                     # Set index for easy use
                     i = USERNAMES.index(username)
                     # Get liked tweets by CashApp
                     print(f'\nSearching for liked tweets by CashApp...\t\t {datetime.datetime.now()} \n')
-                    cashapp_likes = Clients[i].get_liked_tweets(
+                    liked_tweets = Clients[i].get_liked_tweets(
                         id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
                     # If the search was successful, break out of the loop
                     break
                 except Exception as e:
                     print(f'Failed getting liked tweets by CashApp: {e} {datetime.datetime.now()} ')
+                    if i == len(USERNAMES)-1:
+                        print(f'Failed to search for tweets using any account, exiting... {datetime.datetime.now()} ')
+                        sys.exit(1)
+                    else:
+                        print(f'Trying with another account... {datetime.datetime.now()} ')
+            for username in USERNAMES:
+                # Search for tweets from CashApp
+                try:
+                    # Set index for easy use
+                    i = USERNAMES.index(username)
+                    # Get tweets from CashApp
+                    print(f'\nSearching for tweets from CashApp...\t\t {datetime.datetime.now()} \n')
+                    cashapp_tweets = Clients[i].get_users_tweets(id=CASHAPPID, user_auth=True)
+                    # If the search was successful, break out of the loop
+                    break
+                except Exception as e:
+                    print(f'Failed getting tweets from CashApp: {e} {datetime.datetime.now()} ')
                     if i == len(USERNAMES)-1:
                         print(f'Failed to search for tweets using any account, exiting... {datetime.datetime.now()} ')
                         sys.exit(1)
@@ -306,7 +329,12 @@ def main_program():
         if not MANUAL_TWEET:
             run_once = False
             keywords = ['drop','must follow','partnered','your $cashtag','below','partner', 'giveaway', 'give away','chance to win','must follow to win', 'celebrate']
-            for tweet in cashapp_likes.data:
+            # Search liked tweets by CashApp
+            for tweet in liked_tweets.data:
+                if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
+                    final_list.append(tweet)
+            # Search tweets from CashApp
+            for tweet in cashapp_tweets.data:
                 if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                     final_list.append(tweet)
             if final_list == []:
@@ -315,10 +343,13 @@ def main_program():
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
             append_cached_tweets(giveaway_tweet.id)
-            #cached_tweets.append(giveaway_tweet.id)
             print(giveaway_tweet.text)
             # Get user mentions
-            mentions = findMentions(giveaway_tweet.text)
+            try:
+                mentions = findMentions(giveaway_tweet.text)
+            except Exception as e:
+                print(f'Failed getting mentions, skipping: {e} {datetime.datetime.now()} ')
+                mentions = ""
             mentionsList = mentions.replace("@", "").split(" ")
             # Get hashtags
             hashtags = findHashtags(giveaway_tweet.text)
