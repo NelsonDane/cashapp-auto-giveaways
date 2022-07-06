@@ -227,10 +227,10 @@ def main_program():
                        consumer_secret=CONSUMER_SECRETS[i], access_token=ACCESS_TOKENS[i], access_token_secret=ACCESS_TOKEN_SECRETS[i]))
 
     # Generate userID's and check if they follow @CashApp
-    # for client in Clients:
+    for client in Clients:
         # Set index for easy use
-        #i = Clients.index(client)
-        #followAccount(client, USERNAMES[i], "CashApp")
+        i = Clients.index(client)
+        followAccount(client, USERNAMES[i], "CashApp")
 
     # Declare cached tweets list
     cached_tweets = []
@@ -310,6 +310,7 @@ def main_program():
                     print()
                     # Loop through each cashtag
                     for username in USERNAMES:
+                        sleep(random.uniform(1, 5))
                         i = USERNAMES.index(username)
                         # Check if tweet is already replied to, and if not then continue to the giveaway tweet
                         if not giveaway_tweet.id in recent_tweet_ids[i]:
