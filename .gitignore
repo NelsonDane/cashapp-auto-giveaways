@@ -2,3 +2,4 @@
 .DS_store
 __pycache__
 .vscode
+cached_tweets.txt

@@ -3,6 +3,7 @@
 
 import os
 import sys
+from tabnanny import check
 import traceback
 import datetime
 import tweepy
@@ -105,6 +106,36 @@ if START_TIME > END_TIME:
     raise Exception("Start time must be before end time")
 
 # Functions
+
+# Function to check if cached tweets file exists, creating it if it doesn't
+def cached_tweets_init():
+    if not os.path.isfile("cached_tweets.txt"):
+        open("cached_tweets.txt", "a").close()
+        print(f"Created new cached_tweets.txt file \t\t\t{datetime.datetime.now()}")
+    else:
+        print(f"cached_tweets.json file already exists \t\t{datetime.datetime.now()}")
+
+# Function to check if tweet id exists in cached tweets file
+def check_cached_tweets(tweet_id):
+    # Open cached tweets file
+    with open("cached_tweets.txt") as f:
+        # Read each line
+        lines = f.readlines()
+        # Strip newline characters
+        lines = [line.strip() for line in lines]
+        # Check if tweet id is in the file
+        if str(tweet_id) in lines:
+            print(f"Tweet {tweet_id} found in cache \t\t\t{datetime.datetime.now()}")
+            return True
+        else:
+            return False
+
+def append_cached_tweets(tweet_id):
+    # Open cached tweets file
+    with open("cached_tweets.txt", "a") as f:
+        # Write tweet id to file
+        f.write(f"{tweet_id}\n")
+        print(f"Appended {tweet_id} to cached_tweets.txt \t\t{datetime.datetime.now()}")
 
 # Function to follow Twitter accounts
 def followAccount(client, currentUsername, usernameToFollow):
@@ -221,7 +252,10 @@ def main_program():
             followAccount(client, USERNAMES[i], "CashApp")
 
     # Declare cached tweets list
-    cached_tweets = []
+    #cached_tweets = []
+
+    # Initialize cached tweets file
+    cached_tweets_init()
 
     # Run search forever
     while True:
@@ -273,14 +307,15 @@ def main_program():
             run_once = False
             keywords = ['drop','must follow','partnered','your $cashtag','below','partner', 'giveaway', 'give away','chance to win','must follow to win', 'celebrate']
             for tweet in cashapp_likes.data:
-                if any(x in tweet.text.lower() for x in keywords) and (tweet.id not in cached_tweets):
+                if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                     final_list.append(tweet)
             if final_list == []:
                 print(f'No tweets found that match the keywords \t\t\t{datetime.datetime.now()}')
 
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
-            cached_tweets.append(giveaway_tweet.id)
+            append_cached_tweets(giveaway_tweet.id)
+            #cached_tweets.append(giveaway_tweet.id)
             print(giveaway_tweet.text)
             # Get user mentions
             mentions = findMentions(giveaway_tweet.text)
