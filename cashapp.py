@@ -49,6 +49,14 @@ else:
     # Set the hashtags
     USERNAMES = os.environ["USERNAMES"].split(",")
 
+# Get whether to check if following Cashapp or not
+CHECK_FOLLOWING_CASHAPP = os.environ.get("CHECK_FOLLOWING_CASHAPP", False)
+# Because it imports as string, convert to bool
+if type(CHECK_FOLLOWING_CASHAPP) == str and (CHECK_FOLLOWING_CASHAPP.lower().replace(" ", "") == "true"):
+    CHECK_FOLLOWING_CASHAPP = True
+else:
+    CHECK_FOLLOWING_CASHAPP = False
+
 # Get start and end time, defaulting to 9:00am and 9:00pm
 START_TIME = float(os.environ.get("START_TIME", "9"))
 END_TIME = float(os.environ.get("END_TIME", "21"))
@@ -205,11 +213,12 @@ def main_program():
         Clients.append(tweepy.Client(bearer_token=BEARER_TOKENS[i], consumer_key=CONSUMER_KEYS[i],
                        consumer_secret=CONSUMER_SECRETS[i], access_token=ACCESS_TOKENS[i], access_token_secret=ACCESS_TOKEN_SECRETS[i]))
 
-    # Generate userID's and check if they follow @CashApp
-    for client in Clients:
-        # Set index for easy use
-        i = Clients.index(client)
-        followAccount(client, USERNAMES[i], "CashApp")
+    # Generate userID's and check if they follow @CashApp if enabled
+    if CHECK_FOLLOWING_CASHAPP:
+        for client in Clients:
+            # Set index for easy use
+            i = Clients.index(client)
+            followAccount(client, USERNAMES[i], "CashApp")
 
     # Declare cached tweets list
     cached_tweets = []
