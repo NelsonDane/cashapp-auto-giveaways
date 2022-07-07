@@ -72,7 +72,7 @@ else:
 
 # Make sure there's enough replies for each account
 if (len(USERNAMES) > len(replies) and WORDED_REPLIES):
-    print(f'Not enough replies for all Twitter accounts, disabling replies \t\t\t{datetime.datetime.now()}')
+    print(f'Not enough replies for all Twitter accounts, disabling replies \t\t\t')
     WORDED_REPLIES = False
 
 # Get check interval, defaulting to 60 seconds
@@ -111,9 +111,9 @@ if START_TIME > END_TIME:
 def cached_tweets_init():
     if not os.path.isfile("cached_tweets.txt"):
         open("cached_tweets.txt", "a").close()
-        print(f"Created new cached_tweets.txt file \t\t\t{datetime.datetime.now()}")
+        print(f"Created new cached_tweets.txt file \t\t\t")
     else:
-        print(f"cached_tweets.json file already exists \t\t{datetime.datetime.now()}")
+        print(f"cached_tweets.json file already exists \t\t")
 
 # Function to check if tweet id exists in cached tweets file
 def check_cached_tweets(tweet_id):
@@ -125,7 +125,7 @@ def check_cached_tweets(tweet_id):
         lines = [line.strip() for line in lines]
         # Check if tweet id is in the file
         if str(tweet_id) in lines:
-            print(f"Tweet {tweet_id} found in cache \t\t\t{datetime.datetime.now()}")
+            print(f"Tweet {tweet_id} found in cache \t\t\t")
             return True
         else:
             return False
@@ -135,7 +135,7 @@ def append_cached_tweets(tweet_id):
     with open("cached_tweets.txt", "a") as f:
         # Write tweet id to file
         f.write(f"{tweet_id}\n")
-        print(f"Appended {tweet_id} to cached_tweets.txt \t\t{datetime.datetime.now()}")
+        print(f"Appended {tweet_id} to cached_tweets.txt \t\t")
 
 # Function to follow Twitter accounts
 def followAccount(client, currentUsername, usernameToFollow):
@@ -147,29 +147,29 @@ def followAccount(client, currentUsername, usernameToFollow):
     try:
         following = client.get_users_following(id=userID)
     except tweepy.errors.TooManyRequests as e:
-        print(f"Rate limit exceeded on {currentUsername}: {e} \t\t{datetime.datetime.now()}")
+        print(f"Rate limit exceeded on {currentUsername}: {e} \t\t")
         return
     # Check to see if it is in the following list, following if it isn't
     found = False
     if following is not None:
         for follow in following.data:
             if follow.username == usernameToFollow:
-                print(f'{currentUsername} is already following {usernameToFollow}\t\t\t{datetime.datetime.now()} ')
+                print(f'{currentUsername} is already following {usernameToFollow}\t\t\t ')
                 found = True
                 break
         if not found:
             try:
                 client.follow_user(target_user_id=followID, user_auth=True)
-                print(f'{currentUsername} just followed {usernameToFollow} \t\t\t {datetime.datetime.now()} ')
+                print(f'{currentUsername} just followed {usernameToFollow} \t\t\t  ')
             except Exception as e:
-                print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()} ')
+                print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t ')
     else:
         # If following is None, then just follow the user
         try:
             client.follow_user(target_user_id=followID, user_auth=True)
-            print(f'{currentUsername} just followed {usernameToFollow} \t\t\t{datetime.datetime.now()} ')
+            print(f'{currentUsername} just followed {usernameToFollow} \t\t\t ')
         except Exception as e:
-            print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()} ')
+            print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t ')
 
 # Function to convert handle into ID
 def idFromUsername(client, username):
@@ -177,7 +177,7 @@ def idFromUsername(client, username):
         id = client.get_user(username=username, tweet_fields=['id'])
         return id.data.id
     except Exception as e:
-        print(f'Error getting ID from {username}: {e} \t\t\t {datetime.datetime.now()} ')
+        print(f'Error getting ID from {username}: {e} \t\t\t  ')
 
 # Function to get username from ID
 def usernameFromID(client, id):
@@ -185,7 +185,7 @@ def usernameFromID(client, id):
         username = client.get_user(id=id, user_fields=['username'])
         return username.data.username
     except Exception as e:
-        print(f'Error getting username from {id}: {e} \t\t\t{datetime.datetime.now()} ')
+        print(f'Error getting username from {id}: {e} \t\t\t ')
 
 # Function to find mentions and hastags
 def findHashtags(tweet):
@@ -240,7 +240,7 @@ def main_program():
         if (datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME):
             run_main = True
         else:
-            print(f'Not running because it is not between {START_TIME} and {END_TIME} \t\t {datetime.datetime.now()}')
+            print(f'Not running because it is not between {START_TIME} and {END_TIME} \t\t ')
             sleep(CHECK_INTERVAL_SECONDS)
 
     # Create client for each Twitter account and make sure they follow @CashApp
@@ -261,7 +261,7 @@ def main_program():
             try:
                 followAccount(client, USERNAMES[i], "CashApp")
             except tweepy.errors.TooManyRequests as e:
-                print(f'Error following CashApp with {USERNAMES[i]}: {e} \t\t\t{datetime.datetime.now()} ')
+                print(f'Error following CashApp with {USERNAMES[i]}: {e} \t\t\t ')
 
     # Initialize cached tweets file
     cached_tweets_init()
@@ -295,38 +295,38 @@ def main_program():
                     # Set index for easy use
                     i = USERNAMES.index(username)
                     # Get liked tweets by CashApp
-                    print(f'\nSearching for liked tweets by CashApp...\t\t {datetime.datetime.now()} \n')
+                    print(f'\nSearching for liked tweets by CashApp...\t\t  \n')
                     liked_tweets = Clients[i].get_liked_tweets(
                         id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
                     # If the search was successful, break out of the loop
                     break
                 except Exception as e:
-                    print(f'Failed getting liked tweets by CashApp: {e} {datetime.datetime.now()} ')
+                    print(f'Failed getting liked tweets by CashApp: {e}  ')
                     if i == len(USERNAMES)-1:
-                        print(f'Failed to search for tweets using any account, exiting... {datetime.datetime.now()} ')
+                        print(f'Failed to search for tweets using any account, exiting...  ')
                         sys.exit(1)
                     else:
-                        print(f'Trying with another account... {datetime.datetime.now()} ')
+                        print(f'Trying with another account...  ')
             for username in USERNAMES:
                 # Search for tweets from CashApp
                 try:
                     # Set index for easy use
                     i = USERNAMES.index(username)
                     # Get tweets from CashApp
-                    print(f'\nSearching for tweets from CashApp...\t\t {datetime.datetime.now()} \n')
+                    print(f'\nSearching for tweets from CashApp...\t\t  \n')
                     cashapp_tweets = Clients[i].get_users_tweets(id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
                     # If the search was successful, break out of the loop
                     break
                 except Exception as e:
-                    print(f'Failed getting tweets from CashApp: {e} {datetime.datetime.now()} ')
+                    print(f'Failed getting tweets from CashApp: {e}  ')
                     if i == len(USERNAMES)-1:
-                        print(f'Failed to search for tweets using any account, exiting... {datetime.datetime.now()} ')
+                        print(f'Failed to search for tweets using any account, exiting...  ')
                         sys.exit(1)
                     else:
-                        print(f'Trying with another account... {datetime.datetime.now()} ')
+                        print(f'Trying with another account...  ')
         else:
             # Use manual search
-            print(f'Manual Tweet ID set to: {MANUAL_TWEET} \t\t\t {datetime.datetime.now()} ')
+            print(f'Manual Tweet ID set to: {MANUAL_TWEET} \t\t\t  ')
             final_list = Clients[1].get_tweet(id=MANUAL_TWEET, tweet_fields=['author_id'], user_auth=True)
             run_once = True
         # Search for tweets that contain "drop" or "must follow" unless manual search is enabled
@@ -342,7 +342,7 @@ def main_program():
                 if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                     final_list.append(tweet)
             if final_list == []:
-                print(f'No tweets found that match the keywords \t\t\t{datetime.datetime.now()}')
+                print(f'No tweets found that match the keywords \t\t\t')
 
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
@@ -352,7 +352,7 @@ def main_program():
             try:
                 mentions = findMentions(giveaway_tweet.text)
             except Exception as e:
-                print(f'Failed getting mentions, skipping: {e} {datetime.datetime.now()} ')
+                print(f'Failed getting mentions, skipping: {e}  ')
                 mentions = ""
             mentionsList = mentions.replace("@", "").split(" ")
             # Get hashtags
@@ -402,11 +402,11 @@ def main_program():
                             print(f'{username} reply: {message}')
                             print()
                     except tweepy.errors.Forbidden:
-                        print(f'Error replying to tweet with {username}: Forbidden {datetime.datetime.now()}')
+                        print(f'Error replying to tweet with {username}: Forbidden ')
                     except Exception as e:
-                        print(f'{datetime.datetime.now()} Error replying to tweet with {username}: {e}')
+                        print(f' Error replying to tweet with {username}: {e}')
                 else:
-                    print(f'{username} already replied to this tweet, moving on... \t\t\t{datetime.datetime.now()}')
+                    print(f'{username} already replied to this tweet, moving on... \t\t\t')
             # If manual search is enabled, break out of the loop
             if run_once:
                 break
@@ -415,11 +415,11 @@ def main_program():
 
         # If manual search is completed, then exit gracefully
         if MANUAL_TWEET:
-            print(f'All finished, exiting... {datetime.datetime.now()} ')
+            print(f'All finished, exiting...  ')
             sys.exit(0)
         else:
             # Sleep for a bit before rechecking for new giveaways
-            print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\t\t\t {datetime.datetime.now()}')
+            print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\t\t\t ')
             sleep(CHECK_INTERVAL_SECONDS)
 
 # Run the main program if it's the correct time
@@ -428,7 +428,7 @@ try:
 
 # Get all exceptions
 except KeyboardInterrupt:
-    print(f'\nDetected KeyboardInterrupt. Exiting... {datetime.datetime.now()} ')
+    print(f'\nDetected KeyboardInterrupt. Exiting...  ')
     sys.exit(0)
 except Exception:
     print('Exited')
