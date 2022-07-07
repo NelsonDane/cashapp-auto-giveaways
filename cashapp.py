@@ -224,8 +224,11 @@ def findMentions(tweet):
         elif atFound:
             usernames += letter
     # Hacky, but add space in front of @, then remove trailing whitespace and return
-    found = (usernames.replace("@", " @")).strip()
-    final = (found.replace(",", "")).replace(".", "")
+    final = (usernames.replace("@", " @")).strip()
+    # Remove unwanted characters
+    unwanted = [',','.',':',';','!','?','(',')','[',']','{','}','<','>','+','=','*','&','%','$','#','^','~','`','|','\\','\'','"']
+    for char in unwanted:
+        final = final.replace(char, '')
     return final
 
 # Main program
@@ -310,7 +313,7 @@ def main_program():
                     i = USERNAMES.index(username)
                     # Get tweets from CashApp
                     print(f'\nSearching for tweets from CashApp...\t\t {datetime.datetime.now()} \n')
-                    cashapp_tweets = Clients[i].get_users_tweets(id=CASHAPPID, user_auth=True)
+                    cashapp_tweets = Clients[i].get_users_tweets(id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
                     # If the search was successful, break out of the loop
                     break
                 except Exception as e:
