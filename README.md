@@ -35,6 +35,7 @@ If configuring multiple Twitter accounts, seperate each value with a comma (no s
 - USERNAMES: Your Twitter account usernames (Do not include the @)
 
 #### Optional Bot Settings
+- CHECK_FOLLOWING_CASHAPP: Set to "true" if the bot should check if each twitter account is following @CashApp, following if they aren't. (Defaults to false)
 - TZ: If using Docker, TZ can be set to specify the timezone for logs. Timezone should be formatted using the [IANA TZ Database](https://www.iana.org/time-zones). (Default America/New_York)
 - START_TIME: The time the bot should start working (Default 9:00am)
 - END_TIME: The time the bot should stop working (Default 9:00pm)
