@@ -11,6 +11,8 @@ import datetime
 from replies import replies
 from time import sleep
 from dotenv import load_dotenv
+from keep_alive import keep_alive
+keep_alive()
 
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
@@ -234,7 +236,9 @@ def main_program():
 
     # Declare cached tweets list
     cached_tweets = []
-
+    cached_tweets.append(1544636258407682050)
+    cached_tweets.append(1544706325988478976)
+    cached_tweets.append(1534251148240072704)
     # Run search forever
     while True:
         try:
