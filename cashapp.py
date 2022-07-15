@@ -111,8 +111,10 @@ def cached_tweets_init():
     if not os.path.isfile("cached_tweets.txt"):
         open("cached_tweets.txt", "a").close()
         print(f"Created new cached_tweets.txt file \t\t\t{datetime.datetime.now()}")
+        print()
     else:
-        print(f"cached_tweets.json file already exists \t\t{datetime.datetime.now()}")
+        print(f"cached_tweets.txt file already exists \t\t\t{datetime.datetime.now()}")
+        print()
 
 # Function to check if tweet id exists in cached tweets file
 def check_cached_tweets(tweet_id):
@@ -352,7 +354,6 @@ def main_program():
 
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
-            append_cached_tweets(giveaway_tweet.id)
             print(giveaway_tweet.text)
             # Get user mentions
             try:
@@ -399,6 +400,7 @@ def main_program():
                             # Quote retweet the giveaway tweet with a worded reply
                             Clients[i].create_tweet(quote_tweet_id=giveaway_tweet.id, text=message, user_auth=True)
                             print(f'{username} reply: {message}')
+                            print()
                         else:
                             message = f"${CASHTAGS[i]} {hashtags} {mentions} @{author_usename}"
                             # Reply to the giveaway tweet without a worded reply
@@ -408,20 +410,22 @@ def main_program():
                             print(f'{username} reply: {message}')
                             print()
                     except tweepy.errors.Forbidden:
-                        print(f'Error replying to tweet with {username}: Forbidden {datetime.datetime.now()}')
+                        print(f'Error replying to tweet with {username}: Forbidden \t\t\t{datetime.datetime.now()}')
                     except Exception as e:
-                        print(f'{datetime.datetime.now()} Error replying to tweet with {username}: {e}')
+                        print(f'Error replying to tweet with {username}: {e} \t\t\t{datetime.datetime.now()}')
                 else:
                     print(f'{username} already replied to this tweet, moving on... \t\t\t{datetime.datetime.now()}')
             # If manual search is enabled, break out of the loop
             if run_once:
                 break
+            # Append the tweet ID to the cached tweet file
+            append_cached_tweets(giveaway_tweet.id)
             # Sleep for a bit before next tweet
             sleep(random.uniform(1, 5))
 
         # If manual search is completed, then exit gracefully
         if MANUAL_TWEET:
-            print(f'All finished, exiting... {datetime.datetime.now()} ')
+            print(f'\nAll finished, exiting... {datetime.datetime.now()} ')
             sys.exit(0)
         else:
             # Sleep for a bit before rechecking for new giveaways
