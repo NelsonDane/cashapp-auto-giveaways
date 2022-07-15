@@ -74,8 +74,8 @@ if (len(USERNAMES) > len(replies) and WORDED_REPLIES):
     print(f'Not enough replies for all Twitter accounts, disabling replies \t\t\t{datetime.datetime.now()}')
     WORDED_REPLIES = False
 
-# Get check interval, defaulting to 60 seconds
-CHECK_INTERVAL_SECONDS = float(os.environ.get("CHECK_INTERVAL_SECONDS", "60"))
+# Get check interval, defaulting to 15 minutes
+CHECK_INTERVAL_SECONDS = float(os.environ.get("CHECK_INTERVAL_SECONDS", "900"))
 
 # See if manual tweet is specified
 if os.environ.get("MANUAL_TWEET"):
