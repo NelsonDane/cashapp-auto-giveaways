@@ -136,6 +136,12 @@ def append_cached_tweets(tweet_id):
         f.write(f"{tweet_id}\n")
         print(f"Appended {tweet_id} to cached_tweets.txt \t\t{datetime.datetime.now()}")
 
+def close_cached_tweets():
+    print(f"Closing cached_tweets.txt \t\t\t{datetime.datetime.now()}")
+    # Close cached tweets file
+    with open("cached_tweets.txt", "a") as f:
+        f.close()
+
 # Function to follow Twitter accounts
 def followAccount(client, currentUsername, usernameToFollow):
     # Get the user ID from the username
@@ -143,32 +149,33 @@ def followAccount(client, currentUsername, usernameToFollow):
     followID = idFromUsername(client, usernameToFollow)
     # Check to see if account is following already
     # Get following list
-    try:
-        following = client.get_users_following(id=userID)
-    except tweepy.errors.TooManyRequests as e:
-        print(f"Rate limit exceeded on {currentUsername}: {e} \t\t{datetime.datetime.now()}")
-        return
-    # Check to see if it is in the following list, following if it isn't
-    found = False
-    if following is not None:
-        for follow in following.data:
-            if follow.username == usernameToFollow:
-                print(f'{currentUsername} is already following {usernameToFollow}\t\t\t{datetime.datetime.now()} ')
-                found = True
-                break
-        if not found:
+    if not userID and not followID:
+        try:
+            following = client.get_users_following(id=userID)
+        except tweepy.errors.TooManyRequests as e:
+            print(f"Rate limit exceeded on {currentUsername}: {e} \t\t{datetime.datetime.now()}")
+            return
+        # Check to see if it is in the following list, following if it isn't
+        found = False
+        if following is not None:
+            for follow in following.data:
+                if follow.username == usernameToFollow:
+                    print(f'{currentUsername} is already following {usernameToFollow}\t\t\t{datetime.datetime.now()} ')
+                    found = True
+                    break
+            if not found:
+                try:
+                    client.follow_user(target_user_id=followID, user_auth=True)
+                    print(f'{currentUsername} just followed {usernameToFollow} \t\t\t {datetime.datetime.now()} ')
+                except Exception as e:
+                    print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()} ')
+        else:
+            # If following is None, then just follow the user
             try:
                 client.follow_user(target_user_id=followID, user_auth=True)
-                print(f'{currentUsername} just followed {usernameToFollow} \t\t\t {datetime.datetime.now()} ')
+                print(f'{currentUsername} just followed {usernameToFollow} \t\t\t{datetime.datetime.now()} ')
             except Exception as e:
                 print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()} ')
-    else:
-        # If following is None, then just follow the user
-        try:
-            client.follow_user(target_user_id=followID, user_auth=True)
-            print(f'{currentUsername} just followed {usernameToFollow} \t\t\t{datetime.datetime.now()} ')
-        except Exception as e:
-            print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()} ')
 
 # Function to convert handle into ID
 def idFromUsername(client, username):
@@ -218,7 +225,7 @@ def findMentions(tweet):
         if letter == "@":
             atFound = True
         # If a space if found, then it's the end of the mention
-        if letter == " ":
+        if letter.isspace():
             atFound = False
         # If none above is true, then add the letter to the username
         elif atFound:
