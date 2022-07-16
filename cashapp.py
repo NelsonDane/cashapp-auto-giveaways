@@ -12,7 +12,6 @@ import datetime
 from replies import replies
 from time import sleep
 from dotenv import load_dotenv
-
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
 
@@ -104,6 +103,9 @@ for i in range(len(USERNAMES)):
 if START_TIME > END_TIME:
     raise Exception("Start time must be before end time")
 
+WEBHOOK_ID = os.environ["WEBHOOK_ID"]
+WEBHOOK_TOKEN = os.environ["WEBHOOK_Token"]
+  
 # Functions
 
 # Function to check if cached tweets file exists, creating it if it doesn't
@@ -349,6 +351,7 @@ def main_program():
             for tweet in cashapp_tweets.data:
                 if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                     final_list.append(tweet)
+                    os.system(f'apprise -vv -t "NEW CASHAPP GIVEAWAY TWEET FOUND!" -b "{tweet}" \ discord:////{WEBHOOK_ID}/{WEBHOOK_TOKEN}')
             if final_list == []:
                 print(f'No tweets found that match the keywords \t\t\t{datetime.datetime.now()}')
 
