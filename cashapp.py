@@ -105,17 +105,21 @@ if START_TIME > END_TIME:
     raise Exception("Start time must be before end time")
 
 # Set up apprise alerts if enabled
-apprise_alerts = os.environ.get("APPRISE_ALERTS")
-if apprise_alerts:
+apprise_found_alerts = os.environ.get("APPRISE_FOUND_ALERTS")
+apprise_success_alerts = os.environ.get("APPRISE_SUCCESS_ALERTS")
+if apprise_found_alerts:
     # Split by commas
-    apprise_alerts = apprise_alerts.split(",")
+    apprise_found_alerts = apprise_found_alerts.split(",")
+if apprise_success_alerts:
+    # Split by commas
+    apprise_success_alerts = apprise_success_alerts.split(",")
 
 # Functions
-def apprise_init():
-    if apprise_alerts:
+def apprise_init(alert_type):
+    if apprise_success_alerts or apprise_found_alerts:
         alerts = apprise.Apprise()
         # Add all services from .env
-        for service in apprise_alerts:
+        for service in alert_type:
             alerts.add(service)
         return alerts
 
@@ -265,7 +269,8 @@ def main_program():
             sleep(CHECK_INTERVAL_SECONDS)
 
     # Initialize apprise alerts
-    alerts = apprise_init()
+    found_alerts = apprise_init(apprise_found_alerts)
+    success_alerts = apprise_init(apprise_success_alerts)
 
     # Create client for each Twitter account and make sure they follow @CashApp
     Clients = []
@@ -364,8 +369,11 @@ def main_program():
             # Search tweets from CashApp
             for tweet in cashapp_tweets.data:
                 if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
+                    # Append to final list if it matches the keywords
                     final_list.append(tweet)
-                    alerts.notify(title="CashApp Giveaway Found!", body=f"{tweet}")
+                    # Send apprise alert if enabled
+                    if found_alerts:
+                        found_alerts.notify(title="CashApp Giveaway Found!", body=f"{tweet}")
             if final_list == []:
                 print(f'No tweets found that match the keywords \t\t\t{datetime.datetime.now()}')
 
@@ -418,6 +426,9 @@ def main_program():
                             Clients[i].create_tweet(quote_tweet_id=giveaway_tweet.id, text=message, user_auth=True)
                             print(f'{username} reply: {message}')
                             print()
+                            # Send apprise alert if enabled
+                            if success_alerts:
+                                success_alerts.notify(title=f"Success with {username}/{CASHTAGS[i]}", body=message)
                         else:
                             message = f"${CASHTAGS[i]} {hashtags} {mentions} @{author_usename}"
                             # Reply to the giveaway tweet without a worded reply
@@ -426,6 +437,9 @@ def main_program():
                             Clients[i].create_tweet(quote_tweet_id=giveaway_tweet.id, text=message, user_auth=True)
                             print(f'{username} reply: {message}')
                             print()
+                            # Send apprise alert if enabled
+                            if success_alerts:
+                                success_alerts.notify(title=f"Success with {username}/{CASHTAGS[i]}", body=message)
                     except tweepy.errors.Forbidden:
                         print(f'Error replying to tweet with {username}: Forbidden \t\t\t{datetime.datetime.now()}')
                     except Exception as e:
@@ -437,6 +451,9 @@ def main_program():
                 break
             # Append the tweet ID to the cached tweet file
             append_cached_tweets(giveaway_tweet.id)
+            # Send apprise alert if enabled
+            if success_alerts:
+                success_alerts.notify(title="CashApp Bot", body="All accounts have replied to the giveaway tweet!")
             # Sleep for a bit before next tweet
             sleep(random.uniform(1, 5))
 
