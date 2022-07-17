@@ -9,6 +9,7 @@ import datetime
 import tweepy
 import random
 import datetime
+import apprise
 from replies import replies
 from time import sleep
 from dotenv import load_dotenv
@@ -104,8 +105,21 @@ for i in range(len(USERNAMES)):
 if START_TIME > END_TIME:
     raise Exception("Start time must be before end time")
 
-# Functions
 
+apprise_alerts = os.environ.get("APPRISE_ALERTS").split(",")
+
+# Functions
+def apprise_init():
+    """
+    Initialize apprise alerts
+    :return:
+    An apprise instance
+    """
+    alerts = apprise.Apprise()
+        # Add all services from .env
+    for service in apprise_alerts:
+      alerts.add(service)
+    return alerts
 # Function to check if cached tweets file exists, creating it if it doesn't
 def cached_tweets_init():
     if not os.path.isfile("cached_tweets.txt"):
@@ -239,7 +253,7 @@ def findMentions(tweet):
     for char in unwanted:
         final = final.replace(char, '')
     return final
-
+alerts = apprise_init()
 # Main program
 def main_program():
     run_main = False
@@ -349,6 +363,7 @@ def main_program():
             for tweet in cashapp_tweets.data:
                 if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                     final_list.append(tweet)
+                    alerts.notify(title="CashApp Giveaway Found!!", body=f"{tweet}")
             if final_list == []:
                 print(f'No tweets found that match the keywords \t\t\t{datetime.datetime.now()}')
 
