@@ -3,7 +3,6 @@
 
 import os
 import sys
-from tabnanny import check
 import traceback
 import datetime
 import tweepy
@@ -105,16 +104,21 @@ for i in range(len(USERNAMES)):
 if START_TIME > END_TIME:
     raise Exception("Start time must be before end time")
 
-
-apprise_alerts = os.environ.get("APPRISE_ALERTS").split(",")
+# Set up apprise alerts if enabled
+apprise_alerts = os.environ.get("APPRISE_ALERTS")
+if apprise_alerts:
+    # Split by commas
+    apprise_alerts = apprise_alerts.split(",")
 
 # Functions
 def apprise_init():
-    alerts = apprise.Apprise()
+    if apprise_alerts:
+        alerts = apprise.Apprise()
         # Add all services from .env
-    for service in apprise_alerts:
-      alerts.add(service)
-    return alerts
+        for service in apprise_alerts:
+            alerts.add(service)
+        return alerts
+
 # Function to check if cached tweets file exists, creating it if it doesn't
 def cached_tweets_init():
     if not os.path.isfile("cached_tweets.txt"):
@@ -248,7 +252,7 @@ def findMentions(tweet):
     for char in unwanted:
         final = final.replace(char, '')
     return final
-alerts = apprise_init()
+
 # Main program
 def main_program():
     run_main = False
@@ -259,6 +263,9 @@ def main_program():
         else:
             print(f'Not running because it is not between {START_TIME} and {END_TIME} \t\t {datetime.datetime.now()}')
             sleep(CHECK_INTERVAL_SECONDS)
+
+    # Initialize apprise alerts
+    alerts = apprise_init()
 
     # Create client for each Twitter account and make sure they follow @CashApp
     Clients = []
@@ -358,7 +365,7 @@ def main_program():
             for tweet in cashapp_tweets.data:
                 if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                     final_list.append(tweet)
-                    alerts.notify(title="CashApp Giveaway Found!!", body=f"{tweet}")
+                    alerts.notify(title="CashApp Giveaway Found!", body=f"{tweet}")
             if final_list == []:
                 print(f'No tweets found that match the keywords \t\t\t{datetime.datetime.now()}')
 
