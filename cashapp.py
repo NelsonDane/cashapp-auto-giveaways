@@ -110,11 +110,6 @@ apprise_alerts = os.environ.get("APPRISE_ALERTS").split(",")
 
 # Functions
 def apprise_init():
-    """
-    Initialize apprise alerts
-    :return:
-    An apprise instance
-    """
     alerts = apprise.Apprise()
         # Add all services from .env
     for service in apprise_alerts:
