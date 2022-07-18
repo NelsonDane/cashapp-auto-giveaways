@@ -371,15 +371,15 @@ def main_program():
                 if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                     # Append to final list if it matches the keywords
                     final_list.append(tweet)
-                    # Send apprise alert if enabled
-                    if found_alerts:
-                        found_alerts.notify(title="CashApp Giveaway Found!", body=f"{tweet}")
             if final_list == []:
                 print(f'No tweets found that match the keywords \t\t\t{datetime.datetime.now()}')
 
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
             print(giveaway_tweet.text)
+            # Send apprise alert if enabled
+            if found_alerts:
+                found_alerts.notify(title="CashApp Giveaway Found!", body=giveaway_tweet.text)
             # Get user mentions
             try:
                 mentions = findMentions(giveaway_tweet.text)
