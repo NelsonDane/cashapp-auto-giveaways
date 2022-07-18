@@ -43,7 +43,7 @@ If configuring multiple Twitter accounts, seperate each value with a comma (no s
 - CHECK_INTERVAL_SECONDS: How often the bot should check for new giveaway Tweets. Don't set this too low or you'll run out of API requests (Default 900 seconds)
 - MANUAL_TWEET: The ID of the Tweet you want the bot to run on. This disables searches, running all accounts once on the given ID. Helpful for if you want to run the bot on a specific ID that wasn't found in the automatic search.
 #### Apprise Alerts
-If you want to use Apprise to send alerts, you'll need to set the following variables with the alert URLS (Full list of services and their URLs available here: https://github.com/caronc/apprise/wiki). If configuring multiple accounts, seperate each value with a comma (no spaces!)
+If you want to use Apprise to send alerts, you'll need to set the following variables with the alert URLS (Full list of services and their URLs available here: https://github.com/caronc/apprise/wiki). If configuring multiple alert services, seperate each value with a comma (no spaces!)
 - APPRISE_FOUND_ALERTS: Whether the bot should alert you when an new giveaway is found (Default False)
 - APPRISE_SUCCESS_ALERTS: Whether the bot should alert you when a giveaway is successful entered (Default False)
 
