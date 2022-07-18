@@ -42,6 +42,10 @@ If configuring multiple Twitter accounts, seperate each value with a comma (no s
 - WORDED_REPLIES: Whether the bot should include a short message with each Tweet reply (Default False)
 - CHECK_INTERVAL_SECONDS: How often the bot should check for new giveaway Tweets. Don't set this too low or you'll run out of API requests (Default 900 seconds)
 - MANUAL_TWEET: The ID of the Tweet you want the bot to run on. This disables searches, running all accounts once on the given ID. Helpful for if you want to run the bot on a specific ID that wasn't found in the automatic search.
+#### Apprise Alerts
+If you want to use Apprise to send alerts, you'll need to set the following variables with the alert URLS (Full list of services and their URLs available here: https://github.com/caronc/apprise/wiki). If configuring multiple alert services, seperate each value with a comma (no spaces!)
+- APPRISE_FOUND_ALERTS: Whether the bot should alert you when an new giveaway is found (Default False)
+- APPRISE_SUCCESS_ALERTS: Whether the bot should alert you when a giveaway is successful entered (Default False)
 
 ### Notes:
 - Because of how docker images/containers work, file edits (like editing the bot or updating the extension) are not immediately reflected in the container, even on a container restart because files are only imported when the base image is built. Because of this, you must stop and remove the container, rebuild the image, then remake the container for the changes to take affect.
@@ -66,16 +70,15 @@ You hit a rate limit on one of your accounts. Wait a while before trying to run 
 - Retweeting
 - Replying
 - Replying with custom messages
+- Quote Replying
 - Searching for tweets
-- Custom sleep times
+- Custom sleep times (Python and Docker)
 - Gathering recent user Tweets to avoid replying twice
 - Running the bot once on a custom Tweet ID
+- Apprise Alerts
 
 ### Maybe working
-- Running the bot at certain times of the day to save on API requests only works in Docker
+- None at this time
 
 ### Upcoming (Hopefully)
-- Alerts for new giveaway tweets
-- Alerts for errors
-- Docker Hub repo
 - More error catching
