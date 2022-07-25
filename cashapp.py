@@ -368,7 +368,6 @@ def main_program():
                 except Exception as e:
                     print(f'Failed getting tweets from CashApp: {e} {datetime.datetime.now()} ')
                     if i == len(USERNAMES)-1:
-
                         if status_alerts:
                             status_alerts.notify(title="CashApp Bot Error", body=f"Failed to search for tweets using any account. Please view the logs for more information. Exiting program...{datetime.datetime.now()}")
 
@@ -408,6 +407,8 @@ def main_program():
                 mentions = findMentions(giveaway_tweet.text)
             except Exception as e:
                 print(f'Failed getting mentions, skipping: {e} {datetime.datetime.now()} ')
+                if status_alerts:
+                    status_alerts.notify(title="Tweepy CashApp Bot Exception", body=f'Error getting mentions for tweet: {giveaway_tweet.text}.')
                 mentions = ""
             mentionsList = mentions.replace("@", "").split(" ")
             # Get hashtags
@@ -465,8 +466,12 @@ def main_program():
                                 status_alerts.notify(title=f"Success with {username}/{CASHTAGS[i]}", body=message)
                     except tweepy.errors.Forbidden:
                         print(f'Error replying to tweet with {username}: Forbidden \t\t\t{datetime.datetime.now()}')
+                        if status_alerts:
+                            status_alerts.notify(title="Tweepy CashApp Bot Exception", body=f'Error replying to tweet with {username}: Forbidden')
                     except Exception as e:
                         print(f'Error replying to tweet with {username}: {e} \t\t\t{datetime.datetime.now()}')
+                        if status_alerts:
+                            status_alerts.notify(title="Tweepy CashApp Bot Exception", body=f'Error replying to tweet with {username}: Forbidden')
                 else:
                     print(f'{username} already replied to this tweet, moving on... \t\t\t{datetime.datetime.now()}')
             # If manual search is enabled, break out of the loop
