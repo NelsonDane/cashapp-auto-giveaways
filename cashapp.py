@@ -163,49 +163,26 @@ def close_cached_tweets():
 
 # Function to follow Twitter accounts
 def followAccount(client, currentUsername, usernameToFollow):
-    # Get the user ID from the username
-    userID = idFromUsername(client, currentUsername)
-    followID = idFromUsername(client, usernameToFollow)
-    # Check to see if account is following already
-    # Get following list
-    if not userID and not followID:
-        try:
-            following = client.get_users_following(id=userID)
-        except tweepy.errors.TooManyRequests as e:
-            print(f"Rate limit exceeded on {currentUsername}: {e} \t\t{datetime.datetime.now()}")
-            return
-        # Check to see if it is in the following list, following if it isn't
-        found = False
-        if following is not None:
-            for follow in following.data:
-                if follow.username == usernameToFollow:
-                    print(f'{currentUsername} is already following {usernameToFollow}\t\t\t{datetime.datetime.now()} ')
-                    found = True
-                    break
-            if not found:
-                try:
-                    client.follow_user(target_user_id=followID, user_auth=True)
-                    print(f'{currentUsername} just followed {usernameToFollow} \t\t\t {datetime.datetime.now()} ')
-                except Exception as e:
-                    print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()} ')
-        else:
-            # If following is None, then just follow the user
-            try:
-                client.follow_user(target_user_id=followID, user_auth=True)
-                print(f'{currentUsername} just followed {usernameToFollow} \t\t\t{datetime.datetime.now()} ')
-            except Exception as e:
-                print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()} ')
+    # Get the ID to follow and follow it
+    try:
+        followID = idFromUsername(client, usernameToFollow)
+        client.follow_user(target_user_id=followID, user_auth=True)
+        print(f'{currentUsername} just followed {usernameToFollow} \t\t\t{datetime.datetime.now()} ')
+    except Exception as e:
+        print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()} ')
 
 # Function to convert handle into ID
 def idFromUsername(client, username):
     try:
         id = client.get_user(username=username, tweet_fields=['id'])
+        sleep(0.5)
         return id.data.id
     except Exception as e:
         print(f'Error getting ID from {username}: {e} \t\t\t {datetime.datetime.now()} ')
 
 # Function to get username from ID
 def usernameFromID(client, id):
+    sleep(0.5)
     try:
         username = client.get_user(id=id, user_fields=['username'])
         return username.data.username
@@ -356,7 +333,15 @@ def main_program():
         else:
             # Use manual search
             print(f'Manual Tweet ID set to: {MANUAL_TWEET} \t\t\t {datetime.datetime.now()} ')
-            final_list = Clients[1].get_tweet(id=MANUAL_TWEET, tweet_fields=['author_id'], user_auth=True)
+            for username in USERNAMES:
+                # Set index for easy use
+                i = USERNAMES.index(username)
+                try:
+                    final_list = Clients[i].get_tweet(id=MANUAL_TWEET, tweet_fields=['author_id'], user_auth=True)
+                    # If the search was successful, break out of the loop
+                    break
+                except Exception as e:
+                    print(f'Failed to get manual tweet: {e} {datetime.datetime.now()} ')
             run_once = True
         # Search for tweets that contain "drop" or "must follow" unless manual search is enabled
         if not MANUAL_TWEET:
@@ -400,18 +385,21 @@ def main_program():
                     # Follow all mentioned users in giveaway tweet
                     if mentions:
                         for mention in mentionsList:
-                            # Set index for easy use
-                            j = mentionsList.index(mention)
-                            # Follow mentioned user
-                            followAccount(Clients[j], USERNAMES[j], mention)
+                            # Don't follow if it's @CashApp
+                            if mention.lower() != "cashapp":
+                                # Follow mentioned user
+                                followAccount(Clients[i], USERNAMES[i], mention)
                     # Follow author of giveaway tweet
-                    author_usename = usernameFromID(
+                    author_username = usernameFromID(
                         Clients[i], giveaway_tweet.author_id)
                     print()
-                    followAccount(Clients[i], username, author_usename)
+                    # Follow author if they weren't follow above
+                    if author_username not in mentionsList:
+                        followAccount(Clients[i], username, author_username)
                     # Retweet the giveaway tweet
                     Clients[i].retweet(giveaway_tweet.id, user_auth=True)
                     print(f'Retweeted using: {username}')
+                    sleep(0.5)
                     # Like the giveaway tweet
                     Clients[i].like(giveaway_tweet.id, user_auth=True)
                     print(f'Liked using: {username}')
@@ -419,7 +407,7 @@ def main_program():
                     try:
                         # Check if worded replies is enabled
                         if WORDED_REPLIES:
-                            message = f"{current_replies[i]} {mentions} @{author_usename} {hashtags} ${CASHTAGS[i]}"
+                            message = f"{current_replies[i]} {mentions} @{author_username} {hashtags} ${CASHTAGS[i]}"
                             # Reply to the giveaway tweet with a worded reply
                             Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id, text=message, user_auth=True)
                             # Quote retweet the giveaway tweet with a worded reply
@@ -430,7 +418,7 @@ def main_program():
                             if success_alerts:
                                 success_alerts.notify(title=f"Success with {username}/{CASHTAGS[i]}", body=message)
                         else:
-                            message = f"${CASHTAGS[i]} {hashtags} {mentions} @{author_usename}"
+                            message = f"${CASHTAGS[i]} {hashtags} {mentions} @{author_username}"
                             # Reply to the giveaway tweet without a worded reply
                             Clients[i].create_tweet(in_reply_to_tweet_id=giveaway_tweet.id,text=message, user_auth=True)
                             # Quote retweet the giveaway tweet without a worded reply
