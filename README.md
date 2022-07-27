@@ -45,7 +45,7 @@ If configuring multiple Twitter accounts, seperate each value with a comma (no s
 #### Apprise Alerts
 If you want to use Apprise to send alerts, you'll need to set the following variables with the alert URLS (Full list of services and their URLs available here: https://github.com/caronc/apprise/wiki). If configuring multiple alert services, seperate each value with a comma (no spaces!)
 - APPRISE_FOUND_ALERTS: Whether the bot should alert you when an new giveaway is found (Default False)
-- APPRISE_SUCCESS_ALERTS: Whether the bot should alert you when a giveaway is successful entered (Default False)
+- APPRISE_STATUS_ALERTS: Whether the bot should alert you when a giveaway is successful entered or errors occured (Default False)
 
 ### Notes:
 - Because of how docker images/containers work, file edits (like editing the bot or updating the extension) are not immediately reflected in the container, even on a container restart because files are only imported when the base image is built. Because of this, you must stop and remove the container, rebuild the image, then remake the container for the changes to take affect.
