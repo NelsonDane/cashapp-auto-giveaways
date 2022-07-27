@@ -105,18 +105,18 @@ if START_TIME > END_TIME:
     raise Exception("Start time must be before end time")
 
 # Set up apprise alerts if enabled
-apprise_found_alerts = os.environ.get("APPRISE_FOUND_ALERTS")
-apprise_success_alerts = os.environ.get("APPRISE_SUCCESS_ALERTS")
-if apprise_found_alerts:
+APPRISE_FOUND_ALERTS = os.environ.get("APPRISE_FOUND_ALERTS")
+APPRISE_STATUS_ALERTS = os.environ.get("APPRISE_STATUS_ALERTS")
+if APPRISE_FOUND_ALERTS:
     # Split by commas
-    apprise_found_alerts = apprise_found_alerts.split(",")
-if apprise_success_alerts:
+    APPRISE_FOUND_ALERTS = APPRISE_FOUND_ALERTS.split(",")
+if APPRISE_STATUS_ALERTS:
     # Split by commas
-    apprise_success_alerts = apprise_success_alerts.split(",")
+    APPRISE_STATUS_ALERTS = APPRISE_STATUS_ALERTS.split(",")
 
 # Functions
 def apprise_init(alert_type):
-    if apprise_success_alerts or apprise_found_alerts:
+    if APPRISE_STATUS_ALERTS or APPRISE_FOUND_ALERTS:
         alerts = apprise.Apprise()
         # Add all services from .env
         for service in alert_type:
@@ -178,6 +178,8 @@ def idFromUsername(client, username):
         sleep(0.5)
         return id.data.id
     except Exception as e:
+        if status_alerts:
+            status_alerts.notify(title="CashApp Bot Error", body=f"Unable to convert {username} to id {datetime.datetime.now()}")
         print(f'Error getting ID from {username}: {e} \t\t\t {datetime.datetime.now()} ')
 
 # Function to get username from ID
@@ -187,6 +189,9 @@ def usernameFromID(client, id):
         username = client.get_user(id=id, user_fields=['username'])
         return username.data.username
     except Exception as e:
+        if status_alerts:
+            status_alerts.notify(title="CashApp Bot Error", body=f"Unable to retrieve username from {id} {datetime.datetime.now()}")
+
         print(f'Error getting username from {id}: {e} \t\t\t{datetime.datetime.now()} ')
 
 # Function to find mentions and hastags
@@ -234,6 +239,10 @@ def findMentions(tweet):
         final = final.replace(char, '')
     return final
 
+# Initialize apprise alerts outside of Main for end Exception to work
+found_alerts = apprise_init(APPRISE_FOUND_ALERTS)
+status_alerts = apprise_init(APPRISE_STATUS_ALERTS)
+
 # Main program
 def main_program():
     run_main = False
@@ -244,10 +253,6 @@ def main_program():
         else:
             print(f'Not running because it is not between {START_TIME} and {END_TIME} \t\t {datetime.datetime.now()}')
             sleep(CHECK_INTERVAL_SECONDS)
-
-    # Initialize apprise alerts
-    found_alerts = apprise_init(apprise_found_alerts)
-    success_alerts = apprise_init(apprise_success_alerts)
 
     # Create client for each Twitter account and make sure they follow @CashApp
     Clients = []
@@ -267,6 +272,8 @@ def main_program():
             try:
                 followAccount(client, USERNAMES[i], "CashApp")
             except tweepy.errors.TooManyRequests as e:
+                if status_alerts:
+                    status_alerts.notify(title="CashApp Bot Error", body=f"Too many requests with {USERNAMES[i]} when following CashApp. {datetime.datetime.now()}")
                 print(f'Error following CashApp with {USERNAMES[i]}: {e} \t\t\t{datetime.datetime.now()} ')
 
     # Initialize cached tweets file
@@ -309,6 +316,8 @@ def main_program():
                 except Exception as e:
                     print(f'Failed getting liked tweets by CashApp: {e} {datetime.datetime.now()} ')
                     if i == len(USERNAMES)-1:
+                        if status_alerts:
+                            status_alerts.notify(title="CashApp Bot Error", body=f"Failed to search for tweets using any account. Exiting program... {datetime.datetime.now()}")
                         print(f'Failed to search for tweets using any account, exiting... {datetime.datetime.now()} ')
                         sys.exit(1)
                     else:
@@ -326,6 +335,9 @@ def main_program():
                 except Exception as e:
                     print(f'Failed getting tweets from CashApp: {e} {datetime.datetime.now()} ')
                     if i == len(USERNAMES)-1:
+                        if status_alerts:
+                            status_alerts.notify(title="CashApp Bot Error", body=f"Failed to search for tweets using any account. Exiting program... {datetime.datetime.now()}")
+
                         print(f'Failed to search for tweets using any account, exiting... {datetime.datetime.now()} ')
                         sys.exit(1)
                     else:
@@ -370,6 +382,9 @@ def main_program():
                 mentions = findMentions(giveaway_tweet.text)
             except Exception as e:
                 print(f'Failed getting mentions, skipping: {e} {datetime.datetime.now()} ')
+                if status_alerts:
+                    status_alerts.notify(title="CashApp Bot Exception", body=f'Error getting mentions for tweet: {giveaway_tweet.text} {datetime.datetime.now()}')
+                # If find mentions failed, then make it empty
                 mentions = ""
             mentionsList = mentions.replace("@", "").split(" ")
             # Get hashtags
@@ -415,8 +430,8 @@ def main_program():
                             print(f'{username} reply: {message}')
                             print()
                             # Send apprise alert if enabled
-                            if success_alerts:
-                                success_alerts.notify(title=f"Success with {username}/{CASHTAGS[i]}", body=message)
+                            if status_alerts:
+                                status_alerts.notify(title=f"Success with {username}/{CASHTAGS[i]}", body=message)
                         else:
                             message = f"${CASHTAGS[i]} {hashtags} {mentions} @{author_username}"
                             # Reply to the giveaway tweet without a worded reply
@@ -426,12 +441,16 @@ def main_program():
                             print(f'{username} reply: {message}')
                             print()
                             # Send apprise alert if enabled
-                            if success_alerts:
-                                success_alerts.notify(title=f"Success with {username}/{CASHTAGS[i]}", body=message)
+                            if status_alerts:
+                                status_alerts.notify(title=f"Success with {username}/{CASHTAGS[i]}", body=message)
                     except tweepy.errors.Forbidden:
                         print(f'Error replying to tweet with {username}: Forbidden \t\t\t{datetime.datetime.now()}')
+                        if status_alerts:
+                            status_alerts.notify(title="CashApp Bot Exception", body=f'Error replying to tweet with {username}: Forbidden {datetime.datetime.now()}')
                     except Exception as e:
                         print(f'Error replying to tweet with {username}: {e} \t\t\t{datetime.datetime.now()}')
+                        if status_alerts:
+                            status_alerts.notify(title="CashApp Bot Exception", body=f'Error replying to tweet with {username}: Forbidden')
                 else:
                     print(f'{username} already replied to this tweet, moving on... \t\t\t{datetime.datetime.now()}')
             # If manual search is enabled, break out of the loop
@@ -440,8 +459,8 @@ def main_program():
             # Append the tweet ID to the cached tweet file
             append_cached_tweets(giveaway_tweet.id)
             # Send apprise alert if enabled
-            if success_alerts:
-                success_alerts.notify(title="CashApp Bot", body="All accounts have replied to the giveaway tweet!")
+            if status_alerts:
+                status_alerts.notify(title="CashApp Bot", body="All accounts have replied to the giveaway tweet!")
             # Sleep for a bit before next tweet
             sleep(random.uniform(1, 5))
 
@@ -457,12 +476,13 @@ def main_program():
 # Run the main program if it's the correct time
 try:
     main_program()
-
 # Get all exceptions
 except KeyboardInterrupt:
     print(f'\nDetected KeyboardInterrupt. Exiting... {datetime.datetime.now()} ')
     sys.exit(0)
 except Exception:
     print('Exited')
+    if status_alerts:
+        status_alerts.notify(title="CashApp Bot Exception", body=f"An exception has occurred, please check the logs... {datetime.datetime.now()}")
     print(f"Exception {traceback.format_exc()}")
     sys.exit(1)
