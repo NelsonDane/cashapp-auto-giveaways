@@ -360,14 +360,16 @@ def main_program():
             run_once = False
             keywords = ['drop','must follow','partnered','your $cashtag','below','partner', 'giveaway', 'give away','chance to win','must follow to win', 'celebrate']
             # Search liked tweets by CashApp
-            for tweet in liked_tweets.data:
-                if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
-                    final_list.append(tweet)
+            if liked_tweets is not None:
+                for tweet in liked_tweets.data:
+                    if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
+                        final_list.append(tweet)
             # Search tweets from CashApp
-            for tweet in cashapp_tweets.data:
-                if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
-                    # Append to final list if it matches the keywords
-                    final_list.append(tweet)
+            if cashapp_tweets is not None:
+                for tweet in cashapp_tweets.data:
+                    if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
+                        # Append to final list if it matches the keywords
+                        final_list.append(tweet)
             if final_list == []:
                 print(f'No tweets found that match the keywords \t\t\t{datetime.datetime.now()}')
 
