@@ -1,4 +1,4 @@
-# Nelson Dane and Prem (Sazn)
+# Nelson Dane and Prem Patel (SaznCode)
 # Python bot to like, retweet, and reply to cashapp giveaways with a user's cashtag
 
 import os
@@ -477,6 +477,12 @@ def main_program():
 try:
     main_program()
 # Get all exceptions
+except TypeError:
+    print(f'{traceback.format_exc()} \t\t\t{datetime.datetime.now()}')
+    if status_alerts:
+        status_alerts.notify(title="CashApp TypeError Bot Exception", body=f'{traceback.format_exc()} {datetime.datetime.now()}\n\n Attempting restart in 15 minutes...')
+    sleep(900)
+    main_program()
 except KeyboardInterrupt:
     print(f'\nDetected KeyboardInterrupt. Exiting... {datetime.datetime.now()} ')
     sys.exit(0)
