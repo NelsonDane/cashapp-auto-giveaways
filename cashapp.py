@@ -167,9 +167,9 @@ def followAccount(client, currentUsername, usernameToFollow):
     try:
         followID = idFromUsername(client, usernameToFollow)
         client.follow_user(target_user_id=followID, user_auth=True)
-        print(f'{currentUsername} just followed {usernameToFollow} \t\t\t{datetime.datetime.now()} ')
+        print(f'{currentUsername} just followed {usernameToFollow} \t\t\t{datetime.datetime.now()}')
     except Exception as e:
-        print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()} ')
+        print(f'Error following {usernameToFollow} with {currentUsername}: {e} \t\t\t{datetime.datetime.now()}')
 
 # Function to convert handle into ID
 def idFromUsername(client, username):
@@ -180,7 +180,7 @@ def idFromUsername(client, username):
     except Exception as e:
         if status_alerts:
             status_alerts.notify(title="CashApp Bot Error", body=f"Unable to convert {username} to id {datetime.datetime.now()}")
-        print(f'Error getting ID from {username}: {e} \t\t\t {datetime.datetime.now()} ')
+        print(f'Error getting ID from {username}: {e} \t\t\t {datetime.datetime.now()}')
 
 # Function to get username from ID
 def usernameFromID(client, id):
@@ -192,7 +192,7 @@ def usernameFromID(client, id):
         if status_alerts:
             status_alerts.notify(title="CashApp Bot Error", body=f"Unable to retrieve username from {id} {datetime.datetime.now()}")
 
-        print(f'Error getting username from {id}: {e} \t\t\t{datetime.datetime.now()} ')
+        print(f'Error getting username from {id}: {e} \t\t\t{datetime.datetime.now()}')
 
 # Function to find mentions and hastags
 def findHashtags(tweet):
@@ -274,7 +274,7 @@ def main_program():
             except tweepy.errors.TooManyRequests as e:
                 if status_alerts:
                     status_alerts.notify(title="CashApp Bot Error", body=f"Too many requests with {USERNAMES[i]} when following CashApp. {datetime.datetime.now()}")
-                print(f'Error following CashApp with {USERNAMES[i]}: {e} \t\t\t{datetime.datetime.now()} ')
+                print(f'Error following CashApp with {USERNAMES[i]}: {e} \t\t\t{datetime.datetime.now()}')
 
     # Initialize cached tweets file
     cached_tweets_init()
@@ -314,14 +314,14 @@ def main_program():
                     # If the search was successful, break out of the loop
                     break
                 except Exception as e:
-                    print(f'Failed getting liked tweets by CashApp: {e} {datetime.datetime.now()} ')
+                    print(f'Failed getting liked tweets by CashApp: {e} {datetime.datetime.now()}')
                     if i == len(USERNAMES)-1:
                         if status_alerts:
                             status_alerts.notify(title="CashApp Bot Error", body=f"Failed to search for tweets using any account. Exiting program... {datetime.datetime.now()}")
-                        print(f'Failed to search for tweets using any account, exiting... {datetime.datetime.now()} ')
+                        print(f'Failed to search for tweets using any account, exiting... {datetime.datetime.now()}')
                         sys.exit(1)
                     else:
-                        print(f'Trying with another account... {datetime.datetime.now()} ')
+                        print(f'Trying with another account... {datetime.datetime.now()}')
             for username in USERNAMES:
                 # Search for tweets from CashApp
                 try:
@@ -333,18 +333,18 @@ def main_program():
                     # If the search was successful, break out of the loop
                     break
                 except Exception as e:
-                    print(f'Failed getting tweets from CashApp: {e} {datetime.datetime.now()} ')
+                    print(f'Failed getting tweets from CashApp: {e} {datetime.datetime.now()}')
                     if i == len(USERNAMES)-1:
                         if status_alerts:
                             status_alerts.notify(title="CashApp Bot Error", body=f"Failed to search for tweets using any account. Exiting program... {datetime.datetime.now()}")
 
-                        print(f'Failed to search for tweets using any account, exiting... {datetime.datetime.now()} ')
+                        print(f'Failed to search for tweets using any account, exiting... {datetime.datetime.now()}')
                         sys.exit(1)
                     else:
-                        print(f'Trying with another account... {datetime.datetime.now()} ')
+                        print(f'Trying with another account... {datetime.datetime.now()}')
         else:
             # Use manual search
-            print(f'Manual Tweet ID set to: {MANUAL_TWEET} \t\t\t {datetime.datetime.now()} ')
+            print(f'Manual Tweet ID set to: {MANUAL_TWEET} \t\t\t {datetime.datetime.now()}')
             for username in USERNAMES:
                 # Set index for easy use
                 i = USERNAMES.index(username)
@@ -353,7 +353,7 @@ def main_program():
                     # If the search was successful, break out of the loop
                     break
                 except Exception as e:
-                    print(f'Failed to get manual tweet: {e} {datetime.datetime.now()} ')
+                    print(f'Failed to get manual tweet: {e} {datetime.datetime.now()}')
             run_once = True
         # Search for tweets that contain "drop" or "must follow" unless manual search is enabled
         if not MANUAL_TWEET:
@@ -381,7 +381,7 @@ def main_program():
             try:
                 mentions = findMentions(giveaway_tweet.text)
             except Exception as e:
-                print(f'Failed getting mentions, skipping: {e} {datetime.datetime.now()} ')
+                print(f'Failed getting mentions, skipping: {e} {datetime.datetime.now()}')
                 if status_alerts:
                     status_alerts.notify(title="CashApp Bot Exception", body=f'Error getting mentions for tweet: {giveaway_tweet.text} {datetime.datetime.now()}')
                 # If find mentions failed, then make it empty
@@ -466,7 +466,7 @@ def main_program():
 
         # If manual search is completed, then exit gracefully
         if MANUAL_TWEET:
-            print(f'\nAll finished, exiting... {datetime.datetime.now()} ')
+            print(f'\nAll finished, exiting... {datetime.datetime.now()}')
             sys.exit(0)
         else:
             # Sleep for a bit before rechecking for new giveaways
@@ -478,7 +478,7 @@ try:
     main_program()
 # Get all exceptions
 except KeyboardInterrupt:
-    print(f'\nDetected KeyboardInterrupt. Exiting... {datetime.datetime.now()} ')
+    print(f'\nDetected KeyboardInterrupt. Exiting... {datetime.datetime.now()}')
     sys.exit(0)
 except Exception:
     print('Exited')
