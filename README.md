@@ -11,7 +11,7 @@ Generate your Consumer Keys, Consumer Secrets, Access Tokens, Access Token Secre
 [Docker Hub](https://hub.docker.com/u/nelsondane) coming soon...
 1. Download and install Docker on your system
 2. cd into this repo and run `docker build -t cashapp .` (Don't forget the period!)
-3. After the image is built, start the container using: `docker run -e CONSUMER_KEYS="YourKeys" -e CONSUMER_SECRETS="YourSecrets" -e ACCESS_TOKENS="YourTokens" -e ACCESS_TOKEN_SECRETS="YourAccessSecrets" -e BEARER_TOKENS="YourBearer" -e CASHTAGS=YourCashtags -e USERNAMES="YourUsernames" --restart unless-stopped --name cashapp cashapp`. (Add any optional settings you want using -e) This creates a new container named cashapp using the cashapp image built in the previous step.
+3. After the image is built, start the container using: `docker run -e CONSUMER_KEYS="YourKeys" -e CONSUMER_SECRETS="YourSecrets" -e ACCESS_TOKENS="YourTokens" -e ACCESS_TOKEN_SECRETS="YourAccessSecrets" -e BEARER_TOKENS="YourBearer" -e CASHTAGS=YourCashtags -e USERNAMES="YourUsernames" -v /path/to/cached_tweets.txt:/app/cached_tweets.txt --restart unless-stopped --name cashapp cashapp`. (Add any optional settings you want using -e) This creates a new container named cashapp using the cashapp image built in the previous step.
 4. Enjoy!
 
 ### Manual Python Script
