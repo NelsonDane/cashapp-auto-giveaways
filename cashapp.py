@@ -291,8 +291,15 @@ def main_program():
             # Create sublist
             sub_recent_tweets = []
             # Get recent tweets
-            recent_tweets = client.get_users_tweets(id=idFromUsername(
-                client, USERNAMES[i]), user_auth=True, tweet_fields=['conversation_id'])
+            try:
+                recent_tweets = client.get_users_tweets(id=idFromUsername(
+                    client, USERNAMES[i]), user_auth=True, tweet_fields=['conversation_id'])
+            except Exception as e:
+                if status_alerts:
+                    status_alerts.notify(title="CashApp Bot Error", body=f"Unable to get recent tweets with {USERNAMES[i]}. {datetime.datetime.now()}")
+                print(f'Error getting recent tweets with {USERNAMES[i]}: {e} \t\t\t{datetime.datetime.now()}')
+                sleep(CHECK_INTERVAL_SECONDS)
+                continue
             # Create list in list: list-ception
             # Make sure recent_tweets isn't None
             if recent_tweets is not None:
