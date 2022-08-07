@@ -100,9 +100,12 @@ for i in range(len(USERNAMES)):
     CASHTAGS[i] = (CASHTAGS[i].replace(" ", "")).replace("$", "")
     USERNAMES[i] = (USERNAMES[i].replace(" ", "")).replace("@", "")
 
-# Make sure start and end times are valid
+# Make sure start and end times are valid, otherwise switch them
 if START_TIME > END_TIME:
-    raise Exception("Start time must be before end time")
+    print("Start time must be before end time, switching times...")
+    temp = START_TIME
+    START_TIME = END_TIME
+    END_TIME = temp
 
 # Set up apprise alerts if enabled
 APPRISE_FOUND_ALERTS = os.environ.get("APPRISE_FOUND_ALERTS")
