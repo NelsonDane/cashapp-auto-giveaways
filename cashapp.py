@@ -3,6 +3,7 @@
 
 import os
 import sys
+import pathlib
 import traceback
 import datetime
 import tweepy
@@ -370,12 +371,12 @@ def main_program():
             run_once = False
             keywords = ['drop','must follow','partnered','your $cashtag','below','partner', 'giveaway', 'give away','chance to win','must follow to win', 'celebrate']
             # Search liked tweets by CashApp
-            if liked_tweets is not None:
+            if liked_tweets is not None or liked_tweets != []:
                 for tweet in liked_tweets.data:
                     if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                         final_list.append(tweet)
             # Search tweets from CashApp
-            if cashapp_tweets is not None:
+            if cashapp_tweets is not None or cashapp_tweets != []:
                 for tweet in cashapp_tweets.data:
                     if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                         # Append to final list if it matches the keywords
@@ -481,6 +482,8 @@ def main_program():
             print(f'\nAll finished, exiting... {datetime.datetime.now()}')
             sys.exit(0)
         else:
+            # Print last cache write time
+            print(f"Last cache write: {datetime.datetime.fromtimestamp((pathlib.Path(r'./cached_tweets.txt')).stat().st_mtime)}")
             # Sleep for a bit before rechecking for new giveaways
             print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\t\t\t {datetime.datetime.now()}')
             sleep(CHECK_INTERVAL_SECONDS)
