@@ -35,7 +35,7 @@ else:
     if (not (len(BEARER_TOKENS) == len(CONSUMER_KEYS) == len(CONSUMER_SECRETS) == len(ACCESS_TOKENS) == len(ACCESS_TOKEN_SECRETS))):
         raise Exception(f"Twitter authentication variables are not the same length.\nBEARER_TOKENS: {len(BEARER_TOKENS)}\nCONSUMER_KEYS: {len(CONSUMER_KEYS)}\nCONSUMER_SECRETS: {len(CONSUMER_SECRETS)}\nACCESS_TOKENS: {len(ACCESS_TOKENS)}\nACCESS_TOKEN_SECRETS: {len(ACCESS_TOKEN_SECRETS)}")
     else:
-      print(f'Number of CashApp/Twitter Accounts: {len(CONSUMER_KEYS)}\n')
+      print(f'\nNumber of CashApp/Twitter Accounts: {len(CONSUMER_KEYS)}\n')
 
 # Set the cashtags
 if not os.environ["CASHTAGS"]:
@@ -147,7 +147,7 @@ def check_cached_tweets(tweet_id):
         lines = [line.strip() for line in lines]
         # Check if tweet id is in the file
         if str(tweet_id) in lines:
-            print(f"Tweet {tweet_id} found in cache \nChecked: {datetime.datetime.now()}\n")
+            print(f"Tweet {tweet_id} found in cache \nChecked: {datetime.datetime.now()}")
             return True
         else:
             return False
@@ -319,7 +319,7 @@ def main_program():
                     # Set index for easy use
                     i = USERNAMES.index(username)
                     # Get liked tweets by CashApp
-                    print(f'\nSearching for liked tweets by CashApp...\n{datetime.datetime.now()} \n')
+                    print(f'Searching for liked tweets by CashApp...\n{datetime.datetime.now()} \n')
                     liked_tweets = Clients[i].get_liked_tweets(
                         id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
                     # If the search was successful, break out of the loop
@@ -339,7 +339,7 @@ def main_program():
                     # Set index for easy use
                     i = USERNAMES.index(username)
                     # Get tweets from CashApp
-                    print(f'\nSearching for tweets from CashApp...\n{datetime.datetime.now()} \n')
+                    print(f'Searching for tweets from CashApp...\n{datetime.datetime.now()} \n')
                     cashapp_tweets = Clients[i].get_users_tweets(id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
                     # If the search was successful, break out of the loop
                     break
@@ -485,7 +485,8 @@ def main_program():
             # Print last cache write time
             print(f"\nLast cache write: {datetime.datetime.fromtimestamp((pathlib.Path(r'./cached_tweets.txt')).stat().st_mtime)}\n")
             # Sleep for a bit before rechecking for new giveaways
-            print(f'\nAll finished, sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\n {datetime.datetime.now()}\n')
+            print(f'\nFinished at: {datetime.datetime.now()}')
+            print(f'Sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\n\n')
             sleep(CHECK_INTERVAL_SECONDS)
 
 # Run the main program if it's the correct time
