@@ -171,7 +171,7 @@ def followAccount(client, currentUsername, usernameToFollow):
     try:
         followID = idFromUsername(client, usernameToFollow)
         client.follow_user(target_user_id=followID, user_auth=True)
-        print(f'{currentUsername} just followed {usernameToFollow} \n{datetime.datetime.now()}\n')
+        print(f'{currentUsername} just followed {usernameToFollow} \n{datetime.datetime.now()}')
     except Exception as e:
         print(f'Error following {usernameToFollow} with {currentUsername}: {e} \n{datetime.datetime.now()}\n')
 
@@ -386,7 +386,7 @@ def main_program():
 
         # Loop through the tweets and process them
         for giveaway_tweet in final_list:
-            print(giveaway_tweet.text)
+            print(f'\n{giveaway_tweet.text}')
             # Send apprise alert if enabled
             if found_alerts:
                 found_alerts.notify(title="CashApp Giveaway Found!", body=giveaway_tweet.text)
@@ -465,7 +465,7 @@ def main_program():
                         if status_alerts:
                             status_alerts.notify(title="CashApp Bot Exception", body=f'Error replying to tweet with {username}: Forbidden')
                 else:
-                    print(f'{username} already replied to this tweet, moving on... \n{datetime.datetime.now()}\n')
+                    print(f'{username} already replied to this tweet, moving on... \n{datetime.datetime.now()}')
             # If manual search is enabled, break out of the loop
             if run_once:
                 break
