@@ -371,12 +371,12 @@ def main_program():
             run_once = False
             keywords = ['drop','must follow','partnered','your $cashtag','below','partner', 'giveaway', 'give away','chance to win','must follow to win', 'celebrate']
             # Search liked tweets by CashApp
-            if liked_tweets is not None or liked_tweets != []:
+            if liked_tweets.data is not None or liked_tweets.data != []:
                 for tweet in liked_tweets.data:
                     if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                         final_list.append(tweet)
             # Search tweets from CashApp
-            if cashapp_tweets is not None or cashapp_tweets != []:
+            if cashapp_tweets.data is not None or cashapp_tweets.data != []:
                 for tweet in cashapp_tweets.data:
                     if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                         # Append to final list if it matches the keywords
