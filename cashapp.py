@@ -252,7 +252,7 @@ def main_program():
     
     if not datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME:
         range = abs((START_TIME - datetime.datetime.now().hour))
-        print(f'Not running because it is between Start Time ({START_TIME}) & End Time {END_TIME}\nSleeping for {range} hours.')
+        print(f'Not running because it is not inbetween Start Time ({START_TIME}) & End Time {END_TIME}\nSleeping for {range} hours.')
         sleep((range) * 3600)
 
     # Create client for each Twitter account and make sure they follow @CashApp
