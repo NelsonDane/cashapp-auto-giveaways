@@ -8,7 +8,6 @@ import traceback
 import datetime
 import tweepy
 import random
-import datetime
 import apprise
 from replies import replies
 from time import sleep
