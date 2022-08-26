@@ -249,14 +249,11 @@ status_alerts = apprise_init(APPRISE_STATUS_ALERTS)
 
 # Main program
 def main_program():
-    run_main = False
-    while not run_main:
-        # Kill the program if the time is outside of the start and end times
-        if (datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME):
-            run_main = True
-        else:
-            print(f'Not running because it is not between {START_TIME} and {END_TIME} \n{datetime.datetime.now()}\n')
-            sleep(CHECK_INTERVAL_SECONDS)
+    
+    if not datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME:
+        range = abs((START_TIME - datetime.datetime.now().hour))
+        print(f'Not running because it is between Start Time ({START_TIME}) & End Time {END_TIME}\nSleeping for {range} hours.')
+        sleep((range) * 3600)
 
     # Create client for each Twitter account and make sure they follow @CashApp
     Clients = []
