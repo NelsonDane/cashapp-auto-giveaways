@@ -9,6 +9,7 @@ on:
 
 jobs:
   call-dockerhub-action:
+    if: github.repository == 'NelsonDane/cashapp-auto-giveaways'
     uses: NelsonDane/DockerHub-Actions/.github/workflows/dockerhub-description.yml@main
     with:
       dockerhub_repo_name: cashapp-auto-giveaways
