@@ -40,7 +40,7 @@ If configuring multiple Twitter accounts, seperate each value with a comma (no s
 - `USERNAMES`: Your Twitter account usernames (Don't include the @)
 
 #### Optional Bot Settings
-- `CHECK_FOLLOWING_CASHAPP`: Set to "true" if the bot should check if each twitter account is following @CashApp, following if they aren't. (Defaults to false)
+- `CHECK_FOLLOWING`: Set to "true" if the bot should check if each twitter account is following @CashApp, following if they aren't. (Defaults to false)
 - `VENMO_GIVEAWAYS`: Set to True or False, depending on whether the bot should check for Venmo tweets in addition to CashApp ones.
 - `VENMO_TAGS`: Your Venmo Tags, seperated by commas.
 - `TZ`: If using Docker, TZ can be set to specify the timezone for logs. Timezone should be formatted using the [IANA TZ Database](https://www.iana.org/time-zones). (Default America/New_York)
