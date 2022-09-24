@@ -49,16 +49,17 @@ else:
 if not os.environ["USERNAMES"]:
     raise Exception("Please specify the usernames in the .env file")
 else:
-    # Set the hashtags
+    # Set the cashtags
     USERNAMES = os.environ["USERNAMES"].split(",")
 
+# Set the Venmo tags
 VENMO_GIVEAWAYS = os.environ.get("VENMO_GIVEAWAYS", "False")
 if VENMO_GIVEAWAYS.lower() == "true":
-    # Set the cashtags
+    # Set the tags
     if not os.environ["VENMO_TAGS"]:
-        print(f"VENMO_TAGS not found in .env file \n{datetime.datetime.now()}\n")
+        print(f"Please specify the Venmo tags in the .env file")
     else:
-        # Set the cashtags
+        # Set the tags
         VENO_TAGS = os.environ["VENMO_TAGS"].split(",")
 
 # Get whether to check if following Cashapp or not
@@ -283,13 +284,16 @@ def main_program():
             # Set index for easy use
             i = Clients.index(client)
             try:
+                # Follow @CashApp if not already following
                 followAccount(client, USERNAMES[i], "CashApp")
             except tweepy.errors.TooManyRequests as e:
                 if status_alerts:
                     status_alerts.notify(title="CashApp Bot Error", body=f"Too many requests with {USERNAMES[i]} when following CashApp. {datetime.datetime.now()}")
                 print(f'Error following CashApp with {USERNAMES[i]}: {e} \n{datetime.datetime.now()}\n')
             try:
-                followAccount(client, USERNAMES[i], "Venmo")
+                # If Venmo is enabled, follow @Venmo
+                if VENMO_GIVEAWAYS:
+                    followAccount(client, USERNAMES[i], "Venmo")
             except tweepy.errors.TooManyRequests as e:
                 if status_alerts:
                     status_alerts.notify(title="CashApp Bot Error", body=f"Too many requests with {USERNAMES[i]} when following CashApp. {datetime.datetime.now()}")
@@ -337,7 +341,9 @@ def main_program():
                     print(f'Searching for liked tweets by CashApp...\n{datetime.datetime.now()} \n')
                     liked_tweets = Clients[i].get_liked_tweets(
                         id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
-                    print(f'Searching for liked tweets by Venmo...\n{datetime.datetime.now()} \n')
+                    # Get liked tweets by Venmo if enabled (WIP)
+                    if VENMO_GIVEAWAYS:
+                        print(f'Searching for liked tweets by Venmo...\n{datetime.datetime.now()} \n')
                     # If the search was successful, break out of the loop
                     break
                 except Exception as e:
@@ -500,11 +506,11 @@ def main_program():
         else:
             # Print last cache write time
             print(f"\nLast cache write: {datetime.datetime.fromtimestamp((pathlib.Path(r'./cached_tweets.txt')).stat().st_mtime)}\n")
-            # Sleep for a bit before rechecking for new giveaways
+            # Print end message
             print(f'\nFinished at: {datetime.datetime.now()}')
             print(f'Sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\n\n')
             print('-----------------------------------------------------------------------')
-
+            # Sleep for a bit before rechecking for new giveaways
             sleep(CHECK_INTERVAL_SECONDS)
 
 # Run the main program if it's the correct time
