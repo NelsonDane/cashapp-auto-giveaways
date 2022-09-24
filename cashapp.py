@@ -16,6 +16,9 @@ from dotenv import load_dotenv
 # CashApp ID Global Variable
 CASHAPPID = '1445650784'
 
+# Venmo ID Global Variable
+VENMOID = '18580938'
+
 # Load the .env file
 load_dotenv()
 
@@ -46,16 +49,26 @@ else:
 if not os.environ["USERNAMES"]:
     raise Exception("Please specify the usernames in the .env file")
 else:
-    # Set the hashtags
+    # Set the cashtags
     USERNAMES = os.environ["USERNAMES"].split(",")
 
+# Set the Venmo tags
+VENMO_GIVEAWAYS = os.environ.get("VENMO_GIVEAWAYS", "False")
+if VENMO_GIVEAWAYS.lower() == "true":
+    # Set the tags
+    if not os.environ["VENMO_TAGS"]:
+        print(f"Please specify the Venmo tags in the .env file")
+    else:
+        # Set the tags
+        VENO_TAGS = os.environ["VENMO_TAGS"].split(",")
+
 # Get whether to check if following Cashapp or not
-CHECK_FOLLOWING_CASHAPP = os.environ.get("CHECK_FOLLOWING_CASHAPP", False)
+CHECK_FOLLOWING = os.environ.get("CHECK_FOLLOWING", False)
 # Because it imports as string, convert to bool
-if type(CHECK_FOLLOWING_CASHAPP) == str and (CHECK_FOLLOWING_CASHAPP.lower().replace(" ", "") == "true"):
-    CHECK_FOLLOWING_CASHAPP = True
+if type(CHECK_FOLLOWING) == str and (CHECK_FOLLOWING.lower().replace(" ", "") == "true"):
+    CHECK_FOLLOWING = True
 else:
-    CHECK_FOLLOWING_CASHAPP = False
+    CHECK_FOLLOWING = False
 
 # Get start and end time, defaulting to 9:00am and 9:00pm
 START_TIME = float(os.environ.get("START_TIME", "9"))
@@ -248,10 +261,10 @@ status_alerts = apprise_init(APPRISE_STATUS_ALERTS)
 
 # Main program
 def main_program():
-    
+    currentHour = datetime.datetime.now().hour
     # Check if program should run, sleeping if it should not
-    if not datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME:
-        range = abs((START_TIME - datetime.datetime.now().hour))
+    if not (currentHour >= START_TIME and currentHour <= END_TIME):
+        range = range = (START_TIME-currentHour) if (currentHour < START_TIME) else ((24 - currentHour) + START_TIME)
         print(f'Not running because it is not inbetween Start Time ({START_TIME}) & End Time ({END_TIME})\nSleeping for {range} hours.\n{datetime.datetime.now()}\n')
         sleep((range) * 3600)
 
@@ -266,12 +279,21 @@ def main_program():
                        consumer_secret=CONSUMER_SECRETS[i], access_token=ACCESS_TOKENS[i], access_token_secret=ACCESS_TOKEN_SECRETS[i]))
 
     # Generate userID's and check if they follow @CashApp if enabled
-    if CHECK_FOLLOWING_CASHAPP:
+    if CHECK_FOLLOWING:
         for client in Clients:
             # Set index for easy use
             i = Clients.index(client)
             try:
+                # Follow @CashApp if not already following
                 followAccount(client, USERNAMES[i], "CashApp")
+            except tweepy.errors.TooManyRequests as e:
+                if status_alerts:
+                    status_alerts.notify(title="CashApp Bot Error", body=f"Too many requests with {USERNAMES[i]} when following CashApp. {datetime.datetime.now()}")
+                print(f'Error following CashApp with {USERNAMES[i]}: {e} \n{datetime.datetime.now()}\n')
+            try:
+                # If Venmo is enabled, follow @Venmo
+                if VENMO_GIVEAWAYS:
+                    followAccount(client, USERNAMES[i], "Venmo")
             except tweepy.errors.TooManyRequests as e:
                 if status_alerts:
                     status_alerts.notify(title="CashApp Bot Error", body=f"Too many requests with {USERNAMES[i]} when following CashApp. {datetime.datetime.now()}")
@@ -283,9 +305,9 @@ def main_program():
     # Run search forever
     while True:
         # Update recent tweets from each user
-        recent_tweet_ids = []
+        recent_cashapp_tweet_ids = []
         # Set final list of tweets list
-        final_list = []
+        final_cashapp_list = []
         for client in Clients:
             # Set index for easy use
             i = Clients.index(client)
@@ -306,7 +328,7 @@ def main_program():
             if recent_tweets is not None:
                 for tweet in (recent_tweets.data):
                     sub_recent_tweets.append(tweet.conversation_id)
-                recent_tweet_ids.append(sub_recent_tweets)
+                recent_cashapp_tweet_ids.append(sub_recent_tweets)
 
         # Search for liked tweets by CashApp if manual search is not enabled
         if not MANUAL_TWEET:
@@ -319,6 +341,9 @@ def main_program():
                     print(f'Searching for liked tweets by CashApp...\n{datetime.datetime.now()} \n')
                     liked_tweets = Clients[i].get_liked_tweets(
                         id=CASHAPPID, user_auth=True, tweet_fields=['author_id'])
+                    # Get liked tweets by Venmo if enabled (WIP)
+                    if VENMO_GIVEAWAYS:
+                        print(f'Searching for liked tweets by Venmo...\n{datetime.datetime.now()} \n')
                     # If the search was successful, break out of the loop
                     break
                 except Exception as e:
@@ -357,7 +382,7 @@ def main_program():
                 # Set index for easy use
                 i = USERNAMES.index(username)
                 try:
-                    final_list = Clients[i].get_tweet(id=MANUAL_TWEET, tweet_fields=['author_id'], user_auth=True)
+                    final_cashapp_list = Clients[i].get_tweet(id=MANUAL_TWEET, tweet_fields=['author_id'], user_auth=True)
                     # If the search was successful, break out of the loop
                     break
                 except Exception as e:
@@ -371,18 +396,18 @@ def main_program():
             if liked_tweets.data is not None or liked_tweets.data != []:
                 for tweet in liked_tweets.data:
                     if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
-                        final_list.append(tweet)
+                        final_cashapp_list.append(tweet)
             # Search tweets from CashApp
             if cashapp_tweets.data is not None or cashapp_tweets.data != []:
                 for tweet in cashapp_tweets.data:
                     if any(x in tweet.text.lower() for x in keywords) and (not check_cached_tweets(tweet.id)):
                         # Append to final list if it matches the keywords
-                        final_list.append(tweet)
-            if final_list == []:
+                        final_cashapp_list.append(tweet)
+            if final_cashapp_list == []:
                 print(f'\nNo tweets found that match the keywords \nChecked: {datetime.datetime.now()}\n')
 
         # Loop through the tweets and process them
-        for giveaway_tweet in final_list:
+        for giveaway_tweet in final_cashapp_list:
             print(f'\n{giveaway_tweet.text}')
             # Send apprise alert if enabled
             if found_alerts:
@@ -406,7 +431,7 @@ def main_program():
             for username in USERNAMES:
                 i = USERNAMES.index(username)
                 # Check if tweet is already replied to, and if not then continue to the giveaway tweet
-                if not giveaway_tweet.id in recent_tweet_ids[i]:
+                if not giveaway_tweet.id in recent_cashapp_tweet_ids[i]:
                     # Follow all mentioned users in giveaway tweet
                     if mentions:
                         for mention in mentionsList:
@@ -481,9 +506,11 @@ def main_program():
         else:
             # Print last cache write time
             print(f"\nLast cache write: {datetime.datetime.fromtimestamp((pathlib.Path(r'./cached_tweets.txt')).stat().st_mtime)}\n")
-            # Sleep for a bit before rechecking for new giveaways
+            # Print end message
             print(f'\nFinished at: {datetime.datetime.now()}')
             print(f'Sleeping for {CHECK_INTERVAL_SECONDS/60} minutes...\n\n')
+            print('-----------------------------------------------------------------------')
+            # Sleep for a bit before rechecking for new giveaways
             sleep(CHECK_INTERVAL_SECONDS)
 
 # Run the main program if it's the correct time
