@@ -11,8 +11,12 @@ Generate your Consumer Keys, Consumer Secrets, Access Tokens, Access Token Secre
 View on [Docker Hub](https://hub.docker.com/u/nelsondane/cashapp-auto-giveaways)
 1. Download and install Docker on your system
 2. Set your environmental variables in your `.env` file
-3. Start the container using: `docker run -d --env-file ./.env -v /abolsute/path/to/cached_tweets.txt:/app/cached_tweets.txt --restart unless-stopped --name cashapp nelsondane/cashapp-auto-giveaways:latest`
+3. Start the container using: `docker run -d --env-file ./.env -v /abolsute/path/to/cached_tweets.txt:/app/cached_tweets.txt --restart unless-stopped --name cashapp nelsondane/cashapp-auto-giveaways:<tag>`
 4. Enjoy!
+
+#### Docker Tags
+- `latest`: latest stable release on [NelsonDane's GitHub](https://github.com/NelsonDane/cashapp-auto-giveaways)
+- `beta`: latest beta release on [Sazn's GitHub](https://github.com/sazncode/cashapp-auto-giveaways-beta)
 
 ### Manual Python Script
 1. Install python-pip on your system
@@ -21,11 +25,6 @@ View on [Docker Hub](https://hub.docker.com/u/nelsondane/cashapp-auto-giveaways)
 4. Configure your `.env`
 5. Run `python cashapp.py`
 6. Enjoy!
-
-### Project Repositories
-- `latest`: latest stable release on [NelsonDane's GitHub](https://github.com/NelsonDane/cashapp-auto-giveaways)
-- `beta`: latest beta release on [Sazn's GitHub](https://github.com/sazncode/cashapp-auto-giveaways-beta)
-
 
 ### Bot Settings via .env
 An example `.env` is included (`.env.example`) which includes all necessary and optional `.env` variables. They are explained here:
@@ -40,10 +39,8 @@ If configuring multiple Twitter accounts, seperate each value with a comma (no s
 - `USERNAMES`: Your Twitter account usernames (Don't include the @)
 
 #### Optional Bot Settings
-- `CHECK_FOLLOWING`: Set to "true" if the bot should check if each twitter account is following @CashApp, following if they aren't. (Defaults to false)
-- `VENMO_GIVEAWAYS`: Set to True or False, depending on whether the bot should check for Venmo tweets in addition to CashApp ones.
-- `VENMO_TAGS`: Your Venmo Tags, seperated by commas.
-- `TZ`: If using Docker, TZ can be set to specify the timezone for logs. Timezone should be formatted using the [IANA TZ Database](https://www.iana.org/time-zones). (Default America/New_York)
+- `CHECK_FOLLOWING`: Set to `true` if the bot should check if each twitter account is following `@CashApp` (Or `@Venmo` if enabled), following if they aren't. (Defaults to `false`)
+- `TZ`: If using Docker, TZ can be set to specify the timezone for logs. Timezone should be formatted using the [IANA TZ Database](https://www.iana.org/time-zones). (Default `America/New_York`)
 - `START_TIME`: The time the bot should start working (Default 9:00am)
 - `END_TIME`: The time the bot should stop working (Default 9:00pm)
 - `WORDED_REPLIES`: Whether the bot should include a short message with each Tweet reply (Default False)
@@ -54,8 +51,12 @@ If you want to use Apprise to send alerts, you'll need to set the following vari
 - `APPRISE_FOUND_ALERTS`: Whether the bot should alert you when an new giveaway is found (Default False)
 - `APPRISE_STATUS_ALERTS`: Whether the bot should alert you when a giveaway is successful entered or errors occured (Default False)
 
+#### Beta Settings
+- `VENMO_GIVEAWAYS`: Set to `true` if the bot should check for Venmo tweets in addition to CashApp ones.
+- `VENMO_TAGS`: Your Venmo Tags, seperated by commas.
+
 ### Notes:
-- Another note for Docker, for some reason using quotes ("") around the env values breaks the bot. This doesn't affect the bot when it's ran directly on Windows or MacOS, so something to be aware of if taking the Docker route.
+- Another note for Docker, for some reason using quotes ("") around the `.env` values breaks the bot. This doesn't affect the bot when it's ran via python on Windows or MacOS, so something to be aware of if you plan on taking the Docker route.
 
 ## FAQs
 
