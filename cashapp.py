@@ -1,4 +1,4 @@
-# Nelson Dane and Prem Patel (SaznCode)
+# Nelson Dane and Prem Patel (Prem-ium)
 # Python bot to like, retweet, and reply to cashapp giveaways with a user's cashtag
 
 import os
