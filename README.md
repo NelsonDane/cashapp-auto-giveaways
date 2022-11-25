@@ -16,7 +16,7 @@ View on [Docker Hub](https://hub.docker.com/u/nelsondane/cashapp-auto-giveaways)
 
 #### Docker Tags
 - `latest`: latest stable release on [NelsonDane's GitHub](https://github.com/NelsonDane/cashapp-auto-giveaways)
-- `beta`: latest beta release on [Sazn's GitHub](https://github.com/Prem-ium/cashapp-auto-giveaways-beta)
+- `beta`: latest beta release on [Prem-ium's GitHub](https://github.com/Prem-ium/cashapp-auto-giveaways-beta)
 
 ### Manual Python Script
 1. Install python-pip on your system
