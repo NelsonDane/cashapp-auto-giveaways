@@ -16,7 +16,7 @@ View on [Docker Hub](https://hub.docker.com/u/nelsondane/cashapp-auto-giveaways)
 
 #### Docker Tags
 - `latest`: latest stable release on [NelsonDane's GitHub](https://github.com/NelsonDane/cashapp-auto-giveaways)
-- `beta`: latest beta release on [Sazn's GitHub](https://github.com/sazncode/cashapp-auto-giveaways-beta)
+- `beta`: latest beta release on [Prem-ium's GitHub](https://github.com/Prem-ium/cashapp-auto-giveaways-beta)
 
 ### Manual Python Script
 1. Install python-pip on your system
@@ -46,6 +46,7 @@ If configuring multiple Twitter accounts, seperate each value with a comma (no s
 - `WORDED_REPLIES`: Whether the bot should include a short message with each Tweet reply (Default False)
 - `CHECK_INTERVAL_SECONDS`: How often the bot should check for new giveaway Tweets. Don't set this too low or you'll run out of API requests (Default 900 seconds)
 - `MANUAL_TWEET`: The ID of the Tweet you want the bot to run on. This disables searches, running all accounts once on the given ID. Helpful for if you want to run the bot on a specific ID that wasn't found in the automatic search.
+- `KEEP_ALIVE`:Whether the bot should run a flask server to keep it alive.
 #### Apprise Alerts
 If you want to use Apprise to send alerts, you'll need to set the following variables with the alert URLS (Full list of services and their URLs available here: https://github.com/caronc/apprise/wiki). If configuring multiple alert services, seperate each value with a comma (no spaces!)
 - `APPRISE_FOUND_ALERTS`: Whether the bot should alert you when an new giveaway is found (Default False)
