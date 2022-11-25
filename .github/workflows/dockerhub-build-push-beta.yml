@@ -14,7 +14,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: 'sazncode/cashapp-auto-giveaways-beta'
+          repository: 'Prem-ium/cashapp-auto-giveaways-beta'
           ref: 'main'
       -
         name: Set up QEMU
