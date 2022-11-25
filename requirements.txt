@@ -1,4 +1,4 @@
-apprise==0.9.9
-Flask==2.1.2
-python-dotenv==0.21.0
-tweepy==4.10.0
+apprise
+Flask
+python-dotenv
+tweepy
