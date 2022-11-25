@@ -98,6 +98,11 @@ else:
     # Set manual tweet id to None
     MANUAL_TWEET = None
 
+# Whether to use keep_alive.py
+if (os.environ.get("KEEP_ALIVE", "False").lower() == "true"):
+    from keep_alive import keep_alive
+    keep_alive()
+    
 # Validation
 # Make sure the number of bearer/consumer/acess tokens (twitter accounts), usernames, and cashtags match
 if len(BEARER_TOKENS) != len(CASHTAGS) != len(CONSUMER_KEYS) != len(CONSUMER_SECRETS) != len(ACCESS_TOKENS) != len(ACCESS_TOKEN_SECRETS) != len(USERNAMES) != len(CASHTAGS):
