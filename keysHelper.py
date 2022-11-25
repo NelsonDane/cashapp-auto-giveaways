@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 try:
-    cashtags = os.environ['cashtags'].split(",")
+    cashtags = os.environ['CASHTAGS'].split(",")
 except:
     cashtags = 'your, multiple, cashtags, here'.split(",")
 
