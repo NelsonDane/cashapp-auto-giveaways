@@ -2,6 +2,9 @@
 
 Cool python bot to automatically like, retweet, and reply to CashApp twitter giveaways using multiple Twitter accounts and $Cashtags.
 
+# REPOSITORY ARCHIVED
+Because of Twitter's new API pricing model, this project is no longer sustainable and will be archived (Thanks Elon). I will be leaving the repo up for anyone who wants to fork it or reference it, but I will no longer be maintaining it. Thanks to everyone who used it and contributed to it!
+
 ## Installation
 
 ### Set First: Twitter API
